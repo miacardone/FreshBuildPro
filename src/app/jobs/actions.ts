@@ -6,10 +6,12 @@ import { store } from "@/lib/store";
 import { evaluateSafe } from "@/lib/engine/safe";
 import type {
   Attachment,
+  BeamSize,
   DeckProject,
   JoistSize,
   JoistSpacing,
   PostSize,
+  SpanConfiguration,
   WallCladding,
 } from "@/lib/engine/types";
 
@@ -50,19 +52,26 @@ function readDeckFields(fd: FormData): Omit<DeckProject, "id" | "createdAt" | "u
     joistSize: str(fd, "joistSize") as JoistSize | undefined,
     joistSpacingIn: num(fd, "joistSpacingIn") as JoistSpacing | undefined,
     joistSpanFt: num(fd, "joistSpanFt"),
+    spanConfiguration: str(fd, "spanConfiguration") as SpanConfiguration | undefined,
+    beamOverhangIn: num(fd, "beamOverhangIn"),
+    joistOverhangIn: num(fd, "joistOverhangIn"),
 
+    beamSize: str(fd, "beamSize") as BeamSize | undefined,
     beamSpanFt: num(fd, "beamSpanFt"),
     postSize: str(fd, "postSize") as PostSize | undefined,
     postSpacingFt: num(fd, "postSpacingFt"),
 
     footingDiameterIn: num(fd, "footingDiameterIn"),
+    footingThicknessIn: num(fd, "footingThicknessIn"),
     footingDepthIn: num(fd, "footingDepthIn"),
 
     attachment: str(fd, "attachment") as Attachment | undefined,
     wallCladding: str(fd, "wallCladding") as WallCladding | undefined,
+    ledgerBoltSpacingIn: num(fd, "ledgerBoltSpacingIn"),
 
     guardHeightIn: num(fd, "guardHeightIn"),
     guardOpeningIn: num(fd, "guardOpeningIn"),
+    guardPostSpacingFt: num(fd, "guardPostSpacingFt"),
 
     hasStairs: tri(fd, "hasStairs"),
     stairRisers: num(fd, "stairRisers"),
@@ -70,8 +79,11 @@ function readDeckFields(fd: FormData): Omit<DeckProject, "id" | "createdAt" | "u
     treadDepthIn: num(fd, "treadDepthIn"),
     stairWidthIn: num(fd, "stairWidthIn"),
     hasHandrail: tri(fd, "hasHandrail"),
+    handrailHeightIn: num(fd, "handrailHeightIn"),
 
-    hasCornerBracing: tri(fd, "hasCornerBracing"),
+    hasDiagonalBrace: tri(fd, "hasDiagonalBrace"),
+    hasPostBracing: tri(fd, "hasPostBracing"),
+    hasHotTub: tri(fd, "hasHotTub"),
 
     notes: str(fd, "notes"),
   };

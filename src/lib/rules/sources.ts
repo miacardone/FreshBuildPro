@@ -1,32 +1,65 @@
 import type { Source } from "@/lib/engine/types";
 
+const DECK_PLANS_URL =
+  "https://www.cincinnati-oh.gov/buildings/building-permit-forms-applications/application-forms/all-forms-handouts-checklists-alphabetical-list/deck-plans/";
+
 /**
  * Primary sources. Every rule points at one of these by id.
  *
- * `lastVerified` is the date a human opened the document and confirmed the
- * encoded thresholds still match it. `recheckEveryDays` is the schedule.
- * Run `npm run rules:audit` to list anything past due.
+ * The Cincinnati deck set is cited sheet by sheet rather than as one document,
+ * because that is how a plan examiner reads it — a finding that says which
+ * sheet it came from is one the contractor can actually go look at.
+ *
+ * A copy of the set as transcribed is kept at
+ * docs/sources/cincinnati-residential-deck-drawings.pdf so a rule can be
+ * checked against exactly what was read, not against whatever is at the URL
+ * today.
  */
+
+/** Stamped in the sheet footer of the set as downloaded. */
+const DECK_SET_EDITION = "Sheet footer stamp SampleDeckPlot[3]11.15.06.dwg";
+const DOWNLOADED = "2026-08-31";
+
 export const SOURCES: Record<string, Source> = {
-  "cin-deck-drawings": {
-    id: "cin-deck-drawings",
+  "cin-deck-sheet1": {
+    id: "cin-deck-sheet1",
     jurisdiction: "cincinnati-oh",
     title: 'City of Cincinnati — "Residential Deck Drawings"',
-    locator: "Sheet 1 of 5 — Framing / Footing Table, General Notes",
-    url: "https://www.cincinnati-oh.gov/buildings/permits/residential-permits/",
-    edition: "UNCONFIRMED — record the revision date printed on the sheet",
-    lastVerified: "2026-08-31",
+    locator: "Sheet 1 of 5 — General Notes and Framing/Footing Table",
+    url: DECK_PLANS_URL,
+    edition: DECK_SET_EDITION,
+    lastVerified: DOWNLOADED,
     recheckEveryDays: 90,
   },
-  "cin-rcbo": {
-    id: "cin-rcbo",
+  "cin-deck-sheet2": {
+    id: "cin-deck-sheet2",
     jurisdiction: "cincinnati-oh",
-    title: "Residential Code of Ohio (RCO), as adopted by the City of Cincinnati",
-    locator: "UNCONFIRMED — record chapter and section per rule",
-    url: "https://codes.ohio.gov/ohio-administrative-code/chapter-4101:8",
-    edition: "UNCONFIRMED — record the adopted edition",
-    lastVerified: "2026-08-31",
-    recheckEveryDays: 180,
+    title: 'City of Cincinnati — "Residential Deck Drawings"',
+    locator: "Sheet 2 of 5 — Foundation & Framing Plan, Finished Floor Plan, Front Elevation",
+    url: DECK_PLANS_URL,
+    edition: DECK_SET_EDITION,
+    lastVerified: DOWNLOADED,
+    recheckEveryDays: 90,
+  },
+  "cin-deck-sheet3": {
+    id: "cin-deck-sheet3",
+    jurisdiction: "cincinnati-oh",
+    title: 'City of Cincinnati — "Residential Deck Drawings"',
+    locator: "Sheet 3 of 5 — Stair Section View and Handrail Sections",
+    url: DECK_PLANS_URL,
+    edition: DECK_SET_EDITION,
+    lastVerified: DOWNLOADED,
+    recheckEveryDays: 90,
+  },
+  "cin-deck-sheet4": {
+    id: "cin-deck-sheet4",
+    jurisdiction: "cincinnati-oh",
+    title: 'City of Cincinnati — "Residential Deck Drawings"',
+    locator: "Sheet 4 of 5 — Post & Beam Detail and Ledger Board Details",
+    url: DECK_PLANS_URL,
+    edition: DECK_SET_EDITION,
+    lastVerified: DOWNLOADED,
+    recheckEveryDays: 90,
   },
 };
 

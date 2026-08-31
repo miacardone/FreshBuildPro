@@ -4,7 +4,7 @@
  */
 import { SOURCES, isPastDue } from "@/lib/rules/sources";
 import { allRuleSets } from "@/lib/engine/jurisdictions";
-import { spanTableCoverage } from "@/lib/rules/cincinnati/deck-tables";
+import { CINCINNATI_BEAM_OPTIONS, CINCINNATI_JOIST_SPANS } from "@/lib/rules/cincinnati/deck-tables";
 
 const now = new Date();
 let problems = 0;
@@ -30,6 +30,8 @@ for (const set of allRuleSets()) {
   }
 }
 
-const cov = spanTableCoverage();
-console.log(`\nCincinnati joist span table: ${cov.verified}/${cov.total} cells confirmed`);
+console.log(
+  `\nCincinnati framing table: ${Object.keys(CINCINNATI_JOIST_SPANS).length} joist rows, ` +
+    `${CINCINNATI_BEAM_OPTIONS.length} beam rows transcribed from Sheet 1`,
+);
 console.log(`\n${problems === 0 ? "Nothing past due." : `${problems} item(s) need attention.`}\n`);

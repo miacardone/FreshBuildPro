@@ -12,7 +12,7 @@ against the code for that city and flags what is going to get rejected: the exac
 rule, where it comes from, and how to fix it.
 
 > Joist span of 20 ft exceeds Cincinnati's maximum allowable span of 10 ft for
-> 2x8 at 16" o.c.
+> 2x8 joists at 16" o.c.
 > *Source: City of Cincinnati "Residential Deck Drawings", Sheet 1 of 5,
 > Framing / Footing Table.*
 > → Reduce the span, add a beam line, or size up the joist.
@@ -57,27 +57,48 @@ Four properties are enforced in code, not left to author discipline:
 
 Full detail in [docs/ENGINE.md](docs/ENGINE.md).
 
-### The thing generic tools get wrong
+### The things generic tools get wrong
 
 Every deck-span calculator out there asks what species your lumber is.
 Cincinnati never asks — General Note 2 on the city's own drawing set already
 settles it at No. 2 Southern Pine or better, so the city does not print a species
-column. This app does not ask either, and the rule set says why. An off-the-shelf
-tool answers a question this city does not ask, off a table that does not apply
-here — so it can hand you a number that is technically fine and still gets your
-permit rejected.
+column. It does not print a spacing column either: table note (a) fixes every row
+at 16" o.c. maximum. This app asks for neither, and the rule set says why.
+
+Three more places where the number that governs here is not the number a generic
+tool will give you:
+
+| | Generic / IRC | Cincinnati |
+|---|---|---|
+| Stair riser | 7 3/4" max | **8 1/4" max** (Sheet 3) |
+| Stair tread | 10" min | **9" min** (Sheet 3) |
+| Posts | often "6x6 to be safe" | **4x4 allowed to 8 ft** (General Note 17) |
+
+And one where the generic instinct is not just wrong but expensive: a ledger on
+brick veneer. The reflex is to call that unbuildable and go freestanding.
+Cincinnati publishes a **Brick Veneer Applications** detail on Sheet 4 — through
+bolts to the rim joist, caulk with a spacer, weep holes left clear. The app tells
+the contractor which detail to draw, not to redesign a deck that was fine.
 
 ## Current state of the rule set
 
-13 Cincinnati deck rules are encoded. 2 are verified against a primary source;
-11 have their shape encoded and their number still to be confirmed, and report
-as "needs confirmation" until then. The joist span table has 1 of 12 cells
-confirmed.
+23 Cincinnati deck rules are encoded, every one of them verified against the
+city's published "Residential Deck Drawings" set — the full Framing/Footing
+Table (4 joist rows, 10 beam rows with their footing sizes and ledger bolt
+spacing), the 19 General Notes, and the stair, guard, ledger and bracing details
+on Sheets 2 through 4. A copy of the set as transcribed is kept in
+[docs/sources/](docs/sources/) so a rule can be checked against exactly what was
+read.
 
-That ratio is the honest state of things and the roadmap at the same time —
-[docs/RULE_VERIFICATION.md](docs/RULE_VERIFICATION.md) is the working checklist.
-Confirming a number is a small, mechanical change: read it off the sheet, encode
-it, flip the flag, add a test.
+One thing is deliberately *not* resolved: the city's own set is ambiguous about
+footing dimension [D] — Sheet 1 heads that column "min. thick", Sheet 4 calls it
+the required footing *depth*. The engine reports the conflict instead of picking
+a reading and failing a job on it. That is the behavior working as intended, and
+it is a question for the plan examiner.
+
+[docs/RULE_VERIFICATION.md](docs/RULE_VERIFICATION.md) is the working checklist,
+including what is still open — zoning and setbacks are not encoded at all, and
+the app does not pretend otherwise.
 
 ## Stack
 

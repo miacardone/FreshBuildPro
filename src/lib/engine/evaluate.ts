@@ -21,8 +21,12 @@ const REQUIRED_FIELDS: { key: keyof DeckProject; label: string }[] = [
   { key: "joistSize", label: "Joist size" },
   { key: "joistSpacingIn", label: "Joist spacing" },
   { key: "joistSpanFt", label: "Joist span" },
+  { key: "spanConfiguration", label: "Single-span or multi-span" },
+  { key: "beamSize", label: "Beam size" },
+  { key: "beamSpanFt", label: "Beam span" },
   { key: "attachment", label: "Attachment (ledger or freestanding)" },
   { key: "postSize", label: "Post size" },
+  { key: "footingDiameterIn", label: "Footing diameter" },
   { key: "footingDepthIn", label: "Footing depth" },
 ];
 

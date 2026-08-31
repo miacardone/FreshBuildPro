@@ -157,8 +157,18 @@ export function JobForm({
 
       <Section
         title="Framing"
-        hint="Cincinnati does not ask for lumber species — General Note 2 already sets it at No. 2 Southern Pine or better."
+        hint="No lumber-species field, on purpose — General Note 2 already sets it at No. 2 Southern Pine or better, which is why the city's table has no species column."
       >
+        <Field label="Span configuration" name="spanConfiguration">
+          <Select
+            name="spanConfiguration"
+            defaultValue={p?.spanConfiguration}
+            options={[
+              { value: "single_span", label: "Single-span" },
+              { value: "multi_span", label: "Multi-span" },
+            ]}
+          />
+        </Field>
         <Field label="Joist size" name="joistSize">
           <Select
             name="joistSize"
@@ -173,27 +183,40 @@ export function JobForm({
             options={["12", "16", "24"].map((v) => ({ value: v, label: `${v}" o.c.` }))}
           />
         </Field>
-        <Field label="Joist span" name="joistSpanFt" suffix="ft, clear">
+        <Field label="Joist span" name="joistSpanFt" suffix="ft, clear [A]">
           <Num name="joistSpanFt" defaultValue={p?.joistSpanFt} />
         </Field>
-        <Field label="Beam span" name="beamSpanFt" suffix="ft">
+        <Field label="Beam size" name="beamSize">
+          <Select
+            name="beamSize"
+            defaultValue={p?.beamSize}
+            options={["(2) 2x6", "(2) 2x8", "(2) 2x10", "(2) 2x12"].map((v) => ({ value: v, label: v }))}
+          />
+        </Field>
+        <Field label="Beam span" name="beamSpanFt" suffix="ft [B]">
           <Num name="beamSpanFt" defaultValue={p?.beamSpanFt} />
         </Field>
         <Field label="Post size" name="postSize">
           <Select
             name="postSize"
             defaultValue={p?.postSize}
-            options={[
-              { value: "4x4", label: "4x4" },
-              { value: "6x6", label: "6x6" },
-            ]}
+            options={["4x4", "4x6", "6x6"].map((v) => ({ value: v, label: v }))}
           />
         </Field>
         <Field label="Post spacing" name="postSpacingFt" suffix="ft">
           <Num name="postSpacingFt" defaultValue={p?.postSpacingFt} />
         </Field>
-        <Field label="Corner bracing shown" name="hasCornerBracing">
-          <YesNo name="hasCornerBracing" defaultValue={p?.hasCornerBracing} />
+        <Field label="Beam overhang" name="beamOverhangIn" suffix="in past column">
+          <Num name="beamOverhangIn" defaultValue={p?.beamOverhangIn} />
+        </Field>
+        <Field label="Joist overhang" name="joistOverhangIn" suffix="in past column">
+          <Num name="joistOverhangIn" defaultValue={p?.joistOverhangIn} />
+        </Field>
+        <Field label="2x4 diagonal brace at joists" name="hasDiagonalBrace">
+          <YesNo name="hasDiagonalBrace" defaultValue={p?.hasDiagonalBrace} />
+        </Field>
+        <Field label="6x6 bracing at posts" name="hasPostBracing">
+          <YesNo name="hasPostBracing" defaultValue={p?.hasPostBracing} />
         </Field>
       </Section>
 
@@ -213,21 +236,26 @@ export function JobForm({
             name="wallCladding"
             defaultValue={p?.wallCladding}
             options={[
-              { value: "wood_siding", label: "Wood siding" },
-              { value: "vinyl_siding", label: "Vinyl siding" },
-              { value: "fiber_cement", label: "Fiber cement" },
+              { value: "siding", label: "Siding" },
               { value: "brick_veneer", label: "Brick veneer" },
-              { value: "stucco", label: "Stucco" },
+              { value: "brick_block", label: "Brick / block" },
+              { value: "concrete", label: "Concrete" },
             ]}
           />
+        </Field>
+        <Field label="Ledger bolt spacing" name="ledgerBoltSpacingIn" suffix="in o.c.">
+          <Num name="ledgerBoltSpacingIn" defaultValue={p?.ledgerBoltSpacingIn} />
         </Field>
       </Section>
 
       <Section title="Footings">
-        <Field label="Footing diameter" name="footingDiameterIn" suffix="in">
+        <Field label="Footing diameter" name="footingDiameterIn" suffix="in [C]">
           <Num name="footingDiameterIn" defaultValue={p?.footingDiameterIn} />
         </Field>
-        <Field label="Footing depth" name="footingDepthIn" suffix="in">
+        <Field label="Footing thickness" name="footingThicknessIn" suffix="in [D]">
+          <Num name="footingThicknessIn" defaultValue={p?.footingThicknessIn} />
+        </Field>
+        <Field label="Footing depth below grade" name="footingDepthIn" suffix="in">
           <Num name="footingDepthIn" defaultValue={p?.footingDepthIn} />
         </Field>
       </Section>
@@ -238,6 +266,9 @@ export function JobForm({
         </Field>
         <Field label="Guard opening" name="guardOpeningIn" suffix="in">
           <Num name="guardOpeningIn" defaultValue={p?.guardOpeningIn} />
+        </Field>
+        <Field label="Guard post spacing" name="guardPostSpacingFt" suffix="ft o.c.">
+          <Num name="guardPostSpacingFt" defaultValue={p?.guardPostSpacingFt} />
         </Field>
       </Section>
 
@@ -259,6 +290,15 @@ export function JobForm({
         </Field>
         <Field label="Handrail shown" name="hasHandrail">
           <YesNo name="hasHandrail" defaultValue={p?.hasHandrail} />
+        </Field>
+        <Field label="Handrail height" name="handrailHeightIn" suffix="in above nosing">
+          <Num name="handrailHeightIn" defaultValue={p?.handrailHeightIn} />
+        </Field>
+      </Section>
+
+      <Section title="Loading" hint="The city's stock deck drawings are not designed for spa loading.">
+        <Field label="Hot tub or spa on the deck" name="hasHotTub">
+          <YesNo name="hasHotTub" defaultValue={p?.hasHotTub} />
         </Field>
       </Section>
 

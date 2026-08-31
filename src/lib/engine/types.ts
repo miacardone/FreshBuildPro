@@ -128,10 +128,23 @@ export interface Readiness {
  * ----------------------------------------------------------------------- */
 
 export type JoistSize = "2x6" | "2x8" | "2x10" | "2x12";
+/**
+ * Cincinnati's table fixes spacing at 16" o.c. maximum, so 12 is the only other
+ * value that can pass. 24 is offered because contractors do design at 24 and
+ * need to be told it fails here, not quietly prevented from entering it.
+ */
 export type JoistSpacing = 12 | 16 | 24;
-export type PostSize = "4x4" | "6x6";
+export type BeamSize = "(2) 2x6" | "(2) 2x8" | "(2) 2x10" | "(2) 2x12";
+/** General Note 17 lists 4x4, 4x6 and 6x6. */
+export type PostSize = "4x4" | "4x6" | "6x6";
+export type SpanConfiguration = "single_span" | "multi_span";
 export type Attachment = "ledger" | "freestanding";
-export type WallCladding = "wood_siding" | "vinyl_siding" | "brick_veneer" | "stucco" | "fiber_cement";
+/**
+ * Cincinnati publishes a ledger detail for each of these. Sheet 4 of 5,
+ * Ledger Board Details — including brick veneer, which the city permits with
+ * its own detail rather than prohibiting.
+ */
+export type WallCladding = "siding" | "brick_veneer" | "brick_block" | "concrete";
 
 export interface DeckProject {
   id: string;
@@ -151,21 +164,33 @@ export interface DeckProject {
 
   joistSize?: JoistSize;
   joistSpacingIn?: JoistSpacing;
-  /** Clear span between supports, feet. */
+  /** Clear span between supports, feet — column [A] on the city's table. */
   joistSpanFt?: number;
+  /** Sheet 2 [5] — the table's footing sizes differ between the two. */
+  spanConfiguration?: SpanConfiguration;
+  /** Beam overhang past the center of the column, inches. */
+  beamOverhangIn?: number;
+  /** Joist overhang past the center of the column, inches. */
+  joistOverhangIn?: number;
 
+  beamSize?: BeamSize;
+  /** Column [B] on the city's table, feet. */
   beamSpanFt?: number;
   postSize?: PostSize;
   postSpacingFt?: number;
 
   footingDiameterIn?: number;
+  footingThicknessIn?: number;
   footingDepthIn?: number;
 
   attachment?: Attachment;
   wallCladding?: WallCladding;
+  /** 1/2" ledger board bolt spacing, inches — set by the beam row chosen. */
+  ledgerBoltSpacingIn?: number;
 
   guardHeightIn?: number;
   guardOpeningIn?: number;
+  guardPostSpacingFt?: number;
 
   hasStairs?: boolean;
   stairRisers?: number;
@@ -173,8 +198,14 @@ export interface DeckProject {
   treadDepthIn?: number;
   stairWidthIn?: number;
   hasHandrail?: boolean;
+  handrailHeightIn?: number;
 
-  hasCornerBracing?: boolean;
+  /** Sheet 2 — 2x4 diagonal brace at the bottom of the joists. */
+  hasDiagonalBrace?: boolean;
+  /** Sheet 2 / Sheet 4 — 6x6 diagonal bracing at all posts. */
+  hasPostBracing?: boolean;
+  /** General Note 15 — this drawing set is not designed for spa loading. */
+  hasHotTub?: boolean;
 
   notes?: string;
 }

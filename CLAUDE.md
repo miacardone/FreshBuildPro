@@ -6,6 +6,10 @@ decks. Next.js 16 App Router, TypeScript, Tailwind 4, Vitest.
 Read `docs/ENGINE.md` before touching anything under `src/lib/engine` or
 `src/lib/rules`.
 
+Source of record for every Cincinnati deck rule is the city's "Residential Deck
+Drawings" set, kept at `docs/sources/cincinnati-residential-deck-drawings.pdf`.
+Check a rule against that file, not against memory or a generic code table.
+
 ## Non-negotiables
 
 These are the product, not preferences:
