@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+/*
+ * FreshBuild Pro — a jobsite palette. Slate and steel, with one signal color
+ * per severity. Legible at arm's length on a phone in a truck.
+ */
+:root {
+  --background: #f6f7f8;
+  --surface: #ffffff;
+  --surface-muted: #f1f3f5;
+  --foreground: #14181d;
+  --muted: #5b6672;
+  --border: #dde1e6;
+
+  --brand: #14532d;
+  --brand-soft: #e7f0ea;
+
+  --blocker: #b3261e;
+  --blocker-soft: #fdecea;
+  --correction: #b45309;
+  --correction-soft: #fdf3e3;
+  --confirm: #1d4ed8;
+  --confirm-soft: #eaf0fe;
+  --info: #475569;
+  --info-soft: #eef1f4;
+  --ok: #15803d;
+  --ok-soft: #e8f5ec;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-blocker: var(--blocker);
+  --color-blocker-soft: var(--blocker-soft);
+  --color-correction: var(--correction);
+  --color-correction-soft: var(--correction-soft);
+  --color-confirm: var(--confirm);
+  --color-confirm-soft: var(--confirm-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Inputs share one look so a long intake form does not feel like a tax form. */
+.field {
+  @apply w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground
+         outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15;
+}
+.label {
+  @apply block text-xs font-semibold uppercase tracking-wide text-muted;
+}
+.card {
+  @apply rounded-lg border border-border bg-surface;
+}
