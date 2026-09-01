@@ -57,6 +57,30 @@ Four properties are enforced in code, not left to author discipline:
 
 Full detail in [docs/ENGINE.md](docs/ENGINE.md).
 
+### Working the table backwards
+
+Saying a job will be rejected is half the product. The **Options** tab is the
+other half: given the same Cincinnati table, the solver works backwards to every
+configuration that passes, ranked by how little has to change.
+
+A 20 ft joist run is over every single-span row in the table. The solver answers
+with the routes that exist:
+
+> **2x8 joists at 16" o.c. · multi-span** — 10 ft between supports
+> (2) 2x12 beam · posts no more than 10 ft apart · 22" × 11" footings
+> *Span configuration: single-span → multi-span, add an intermediate beam line*
+
+One click adopts an option and re-runs the engine. Nothing is calculated or
+estimated — joist, beam, post spacing and footing sizes travel together as one
+row of the city's sheet, and if a configuration is not on that sheet it is not
+offered. The tests round-trip **every** option the solver returns back through
+the engine and assert it comes out clean, because a confidently wrong suggestion
+would be worse than no suggestion.
+
+The solver covers framing, footings and the ledger. Guards, stairs and the
+property rules are not its remit, and it says so rather than implying it solved
+them.
+
 ### Tier 1 same-day review
 
 Cincinnati reviews residential decks **under 400 sq ft** the same day, first-come

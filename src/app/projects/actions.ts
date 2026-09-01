@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { store } from "@/lib/store";
 import { evaluateSafe } from "@/lib/engine/safe";
+import { applyOption, solveFraming } from "@/lib/engine/solver";
 import type {
   Attachment,
   BeamSize,
@@ -112,6 +113,28 @@ export async function updateJob(id: string, fd: FormData) {
   revalidatePath("/projects");
   revalidatePath(`/projects/${id}`);
   redirect(`/projects/${id}`);
+}
+
+/**
+ * Adopt one of the solver's options. The index is into the deterministic
+ * ordering solveFraming returns for this project, so the same index always
+ * means the same option.
+ */
+export async function applyFramingOption(id: string, index: number) {
+  const project = await store.get(id);
+  if (!project) throw new Error(`No project ${id}`);
+
+  const option = solveFraming(project)[index];
+  if (!option) throw new Error(`No option ${index} for project ${id}`);
+
+  const updated = await store.update(id, applyOption(project, option));
+  const result = evaluateSafe(updated);
+  if (result.ok) await store.recordEvaluation(result.evaluation);
+
+  revalidatePath("/");
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
+  redirect(`/projects/${id}/issues`);
 }
 
 export async function deleteJob(id: string) {

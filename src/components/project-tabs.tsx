@@ -7,6 +7,7 @@ const TABS = [
   { segment: "", label: "Overview" },
   { segment: "intake", label: "Intake" },
   { segment: "issues", label: "Issues" },
+  { segment: "options", label: "Options" },
   { segment: "documents", label: "Documents" },
   { segment: "checklist", label: "Checklist" },
   { segment: "revisions", label: "Revisions" },

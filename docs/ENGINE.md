@@ -64,6 +64,24 @@ new `src/lib/rules/<city>/` directory. The engine does not change — that is th
 design. Until the rule set exists, the engine says the city is not covered and
 stops.
 
+## The solver
+
+`src/lib/engine/solver.ts` reads the same encoded table in the other direction:
+given a project, enumerate the configurations that pass and rank them by how
+little changes.
+
+It follows the engine's rules. It never proposes a span, footing or post size
+that is not on the city's sheet, and it never claims to have solved a rule
+outside framing. `applyOption` turns a chosen option into a new project, which
+is also what the tests use — every option `solveFraming` returns is applied and
+re-evaluated, and must come back with no framing blockers. That property test is
+the reason to trust the feature.
+
+`solveFraming` treats `joistSpanFt` as the clear span between supports, so a
+deck already framed multi-span covers twice that. Solving on the **total run**
+is what lets the solver offer "add an intermediate beam line" as a real option
+rather than only offering bigger lumber.
+
 ## Readiness score
 
 Starts at 100. Each blocker costs 25, each likely correction 10, each item to
