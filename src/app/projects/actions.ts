@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { store } from "@/lib/store";
+import { resetDemo } from "@/lib/store/cookie-store";
 import { evaluateSafe } from "@/lib/engine/safe";
 import { applyOption, solveFraming } from "@/lib/engine/solver";
 import type {
@@ -139,6 +140,14 @@ export async function applyFramingOption(id: string, index: number) {
 
 export async function deleteJob(id: string) {
   await store.remove(id);
+  revalidatePath("/");
+  revalidatePath("/projects");
+  redirect("/");
+}
+
+/** Put the demo back to the seeded book of jobs. */
+export async function resetDemoData() {
+  await resetDemo();
   revalidatePath("/");
   revalidatePath("/projects");
   redirect("/");

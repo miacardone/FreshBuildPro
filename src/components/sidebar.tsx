@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { resetDemoData } from "@/app/projects/actions";
 
 const NAV = [
   { href: "/", label: "Dashboard", icon: "grid" },
@@ -69,7 +70,7 @@ export function MobileNav() {
           Permit Ops
         </span>
       </div>
-      <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
+      <nav className="flex items-center gap-1 overflow-x-auto px-3 pb-2">
         {NAV.map((item) => (
           <Link
             key={item.href}
@@ -80,8 +81,26 @@ export function MobileNav() {
             {item.label}
           </Link>
         ))}
+        <ResetDemo className="ml-auto shrink-0" />
       </nav>
     </div>
+  );
+}
+
+/**
+ * This is a demo, so anyone showing it needs a way to put the jobs back the way
+ * they found them after clicking around.
+ */
+function ResetDemo({ className = "" }: { className?: string }) {
+  return (
+    <form action={resetDemoData} className={className}>
+      <button
+        type="submit"
+        className="whitespace-nowrap rounded px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-rail-ink transition hover:text-gold-bright"
+      >
+        Reset demo
+      </button>
+    </form>
   );
 }
 
@@ -116,6 +135,9 @@ export function Sidebar() {
           Design. Comply. Build.
         </div>
         <div className="mt-1 text-[9px] uppercase tracking-[0.14em] text-rail-ink">Veteran Owned</div>
+        <div className="mt-3 border-t border-rail-line pt-3">
+          <ResetDemo />
+        </div>
       </div>
     </aside>
   );

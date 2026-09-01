@@ -144,9 +144,14 @@ the app does not pretend otherwise.
 
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind 4 · Vitest.
 
-Storage is a JSON file behind a `ProjectStore` interface
-(`src/lib/store/`) — swap in Postgres by writing one more implementation and
-changing a single export. That goes in before any contractor's data does.
+**This is a demo.** There is no database. The seeded jobs come from code, and
+anything you create or change in the app rides in your own cookie — so it works
+across serverless instances, costs nothing, and two people demoing at once never
+collide. "Reset demo" in the sidebar puts the seeded jobs back.
+
+Storage sits behind a `ProjectStore` interface (`src/lib/store/`), so the day
+real contractor data goes in, that means writing one more implementation and
+changing a single export. Nothing above that layer changes.
 
 ## Layout
 
