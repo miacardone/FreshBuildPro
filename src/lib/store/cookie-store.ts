@@ -137,7 +137,9 @@ export const cookieStore: ProjectStore = {
 /** Put the demo back to the seeded book of jobs. */
 export async function resetDemo(): Promise<void> {
   try {
-    (await cookies()).delete(COOKIE);
+    // The cookie was set with an explicit path, so the delete has to match it —
+    // delete(name) alone silently misses and the demo never resets.
+    (await cookies()).delete({ name: COOKIE, path: "/" });
   } catch {
     /* only callable from a server action */
   }
