@@ -16,14 +16,14 @@ export type Confidence =
   | "needs_confirmation";
 
 export type Severity =
-  /** Will be rejected. Cannot submit like this. */
+  /** Will be rejected or held at submission. Cannot go in like this. */
   | "blocker"
   /** Likely to draw a correction from the plan examiner. */
-  | "correction"
+  | "warning"
   /** Engine cannot make the call yet — a human must confirm against the source. */
   | "confirm"
   /** Nothing wrong. Context worth knowing about this jurisdiction. */
-  | "info";
+  | "advisory";
 
 export interface Source {
   id: string;
@@ -66,6 +66,8 @@ export interface RuleContext {
 
 export interface Rule<P = DeckProject> {
   id: string;
+  /** Stable examiner-facing code, e.g. CIN-DECK-011. Never renumber a live code. */
+  code: string;
   jurisdiction: string;
   trade: string;
   /** Short name a contractor would recognize. */
@@ -75,6 +77,11 @@ export interface Rule<P = DeckProject> {
   confidence: Confidence;
   /** ISO date this rule was last edited. */
   encodedOn: string;
+  /**
+   * When this rule trips, the job is outside what the city's stock drawing set
+   * covers and needs an engineered design. Drives the Engineering Review status.
+   */
+  escalatesToEngineering?: boolean;
   /** Skip the rule entirely when it does not apply to this job. */
   appliesTo?: (project: P) => boolean;
   /** Run the check. Emit findings through ctx. Must be pure. */
@@ -89,7 +96,13 @@ export type RuleCategory =
   | "stairs"
   | "lateral"
   | "materials"
-  | "submission";
+  | "submission"
+  /** Which jurisdiction and review path the job falls under. */
+  | "jurisdiction"
+  /** Historic designation, floodplain, and other property-level constraints. */
+  | "property"
+  /** Scope that pulls in a separate trade permit. */
+  | "trade_permit";
 
 /** One rule's outcome in a single evaluation. Kept for the audit trail. */
 export interface RuleRun {
@@ -111,17 +124,33 @@ export interface Evaluation {
   /** Every rule the engine considered, whether or not it tripped. */
   runs: RuleRun[];
   readiness: Readiness;
+  /** Which of the city's review paths this job lands in. */
+  reviewTier: ReviewTier;
 }
 
 export interface Readiness {
   score: number;
-  status: "not_ready" | "needs_work" | "ready";
+  status: ProjectStatus;
   label: string;
   blockers: number;
-  corrections: number;
+  warnings: number;
   confirmations: number;
+  advisories: number;
   missingFields: string[];
 }
+
+export type ProjectStatus =
+  /** A blocker stands, or the package is incomplete. */
+  | "blocked"
+  /** Nothing blocking, but items still want attention. */
+  | "needs_work"
+  /** Clean against the encoded rule set. */
+  | "ready"
+  /** Outside what the city's stock drawing set covers — needs an engineer. */
+  | "engineering_review";
+
+/** Cincinnati's review path, from the city's Permit Review Process. */
+export type ReviewTier = "tier_1" | "tier_2_or_3" | "unknown";
 
 /* --------------------------------------------------------------------------
  * The deck project. Plain fields — no CAD, no drafting.
@@ -206,6 +235,21 @@ export interface DeckProject {
   hasPostBracing?: boolean;
   /** General Note 15 — this drawing set is not designed for spa loading. */
   hasHotTub?: boolean;
+
+  /* Property constraints — a deck can be framed perfectly and still be refused
+     on where it sits or what the property is. */
+  /** Historic-designated property: a Certificate of Appropriateness comes first. */
+  inHistoricDistrict?: boolean;
+  /** Floodplain changes which review tier the job lands in. */
+  inFloodplain?: boolean;
+
+  /* Scope that pulls in a separate trade permit. */
+  /** Lighting, receptacles, outdoor kitchen wiring. */
+  hasElectrical?: boolean;
+  /** Gas or water lines run to the deck. */
+  hasPlumbing?: boolean;
+  /** HVAC or gas appliance scope. */
+  hasMechanical?: boolean;
 
   notes?: string;
 }

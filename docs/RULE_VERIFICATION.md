@@ -71,6 +71,18 @@ at the URL today.
 | Siding detail | Flashing under siding, over top and behind ledger, drip-edge at ends |
 | Footing depth | 2'-6" min |
 
+### Permitting and property — city process pages
+
+| Item | Value | Source |
+|---|---|---|
+| Tier 1 same-day review | Residential decks under 400 sq ft | Permit Review Process |
+| Tier 1 hours | 7:30 a.m.–2:30 p.m. Mon–Fri, first-come first-served | " |
+| Tier 2 | Review by appointment, 5 workdays vs 15 | " |
+| Permit required for decks | Yes | Residential Permit Guide |
+| Historic property | Certificate of Appropriateness from the Urban Conservator, before work starts | Residential Permit Guide + Decks forms page |
+| Deck submission package | Building Application · Site Plan · Deck Plan · Required Permit Documentation | Decks forms page |
+| Zoning | Reviewed separately; walk-through not offered where in-depth zoning review is needed | Residential Permit Guide |
+
 ## Open questions
 
 - [ ] **Dimension [D] is ambiguous in the city's own set.** Sheet 1 heads the
@@ -85,9 +97,20 @@ at the URL today.
 - [ ] Stair geometry beyond the deck sheets (landings at doors, headroom) is not
       encoded. If a job needs it, it comes from the adopted Residential Code of
       Ohio, which is not yet a registered source.
+- [ ] **Does the floodplain pull a Tier 1 deck out of same-day review?** The city
+      states a project within the floodplain is automatically Tier 3, but that
+      sentence sits under the Tier 2 list. `cin-floodplain-tier` reports this
+      rather than assuming either way.
+- [ ] Separate electrical / plumbing / mechanical permits are encoded as
+      needs-confirmation. The permit guide says they "may be necessary" without
+      addressing decks specifically — confirm the actual trigger.
 - [ ] Nothing is encoded for zoning — setbacks, lot coverage, rear-yard
       encroachment. A deck can be perfectly framed and still be rejected on
-      placement. Currently out of scope, and the app does not claim otherwise.
+      placement. `cin-zoning-not-evaluated` states this on every job so a
+      contractor cannot mistake silence for approval.
+- [ ] Accepted file types (PDF/JPG/JPEG/TIFF/TIF) are shown in the UI but come
+      from the online-permitting flow, not a cited page. Confirm and register a
+      source.
 
 ## Schedule
 

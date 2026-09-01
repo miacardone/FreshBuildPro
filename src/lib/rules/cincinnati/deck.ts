@@ -34,6 +34,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* ================================================================ framing */
   {
     id: "cin-deck-joist-spacing",
+    code: "CIN-DECK-010",
     jurisdiction: CIN,
     trade: DECK,
     title: "Joist spacing at 16 in o.c. maximum",
@@ -60,6 +61,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-joist-span",
+    code: "CIN-DECK-020",
     jurisdiction: CIN,
     trade: DECK,
     title: "Joist span within the city's framing table",
@@ -86,6 +88,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-beam-row",
+    code: "CIN-DECK-030",
     jurisdiction: CIN,
     trade: DECK,
     title: "Beam size is one of the rows offered for that joist",
@@ -93,6 +96,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
     sourceId: "cin-deck-sheet1",
     confidence: "verified",
     encodedOn: ENCODED,
+    escalatesToEngineering: true,
     appliesTo: (p) => !!p.joistSize && !!p.beamSize,
     check: (p, ctx) => {
       const option = findBeamOption(p.joistSize!, p.beamSize!);
@@ -114,6 +118,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-beam-span",
+    code: "CIN-DECK-040",
     jurisdiction: CIN,
     trade: DECK,
     title: "Beam span within the city's framing table",
@@ -140,6 +145,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-overhangs",
+    code: "CIN-DECK-050",
     jurisdiction: CIN,
     trade: DECK,
     title: "Beam and joist overhang past the column",
@@ -174,6 +180,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-species-settled",
+    code: "CIN-DECK-060",
     jurisdiction: CIN,
     trade: DECK,
     title: "Lumber species is settled by General Note 2",
@@ -183,7 +190,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
     encodedOn: ENCODED,
     check: (_p, ctx) => {
       ctx.flag({
-        severity: "info",
+        severity: "advisory",
         title: `Cincinnati does not ask for lumber species — General Note 2 already sets it at ${CINCINNATI_SPECIES}`,
         why:
           "That is why the city's table has no species column, and no spacing column either. A generic span calculator asks " +
@@ -197,6 +204,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* =============================================================== footings */
   {
     id: "cin-deck-footing-size",
+    code: "CIN-DECK-070",
     jurisdiction: CIN,
     trade: DECK,
     title: "Footing diameter and thickness from the table row",
@@ -243,6 +251,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-footing-depth",
+    code: "CIN-DECK-080",
     jurisdiction: CIN,
     trade: DECK,
     title: "Footing depth below grade",
@@ -269,6 +278,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* ============================================================ posts, bracing */
   {
     id: "cin-deck-post-size",
+    code: "CIN-DECK-090",
     jurisdiction: CIN,
     trade: DECK,
     title: "Post size for the deck height",
@@ -296,6 +306,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-diagonal-brace",
+    code: "CIN-DECK-100",
     jurisdiction: CIN,
     trade: DECK,
     title: "2x4 diagonal brace at the joists",
@@ -321,6 +332,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-post-bracing",
+    code: "CIN-DECK-110",
     jurisdiction: CIN,
     trade: DECK,
     title: "6x6 diagonal bracing over 10 ft above grade",
@@ -347,6 +359,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* ============================================================= attachment */
   {
     id: "cin-deck-ledger-detail",
+    code: "CIN-DECK-120",
     jurisdiction: CIN,
     trade: DECK,
     title: "Ledger board detail for the wall type",
@@ -385,7 +398,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
       if (!d) return;
 
       ctx.flag({
-        severity: "info",
+        severity: "advisory",
         title: `Show the "${d.label}" ledger detail from Sheet 4`,
         why:
           "Cincinnati publishes a ledger detail for this wall type, so the attachment is a matter of showing the right detail — " +
@@ -398,6 +411,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-ledger-bolt-spacing",
+    code: "CIN-DECK-130",
     jurisdiction: CIN,
     trade: DECK,
     title: "1/2 in ledger bolt spacing from the table row",
@@ -413,7 +427,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
       if (p.ledgerBoltSpacingIn == null) {
         ctx.flag({
-          severity: "correction",
+          severity: "warning",
           title: `Ledger bolt spacing is not on the plan — this row calls for ${required}" o.c.`,
           why:
             'The last column of the Framing/Footing Table sets 1/2" ledger board bolt spacing per beam row. ' +
@@ -440,6 +454,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* ================================================================= guards */
   {
     id: "cin-deck-guard-required",
+    code: "CIN-DECK-140",
     jurisdiction: CIN,
     trade: DECK,
     title: "Guard required over 30 in above grade",
@@ -477,6 +492,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-guard-opening",
+    code: "CIN-DECK-150",
     jurisdiction: CIN,
     trade: DECK,
     title: "Guard opening will not pass a 4 in object",
@@ -503,6 +519,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-guard-post-spacing",
+    code: "CIN-DECK-160",
     jurisdiction: CIN,
     trade: DECK,
     title: "Guard post spacing at 6 ft o.c. maximum",
@@ -529,6 +546,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* ================================================================= stairs */
   {
     id: "cin-deck-stair-riser",
+    code: "CIN-DECK-170",
     jurisdiction: CIN,
     trade: DECK,
     title: "Stair riser height",
@@ -555,6 +573,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-stair-tread",
+    code: "CIN-DECK-180",
     jurisdiction: CIN,
     trade: DECK,
     title: "Stair tread depth",
@@ -580,6 +599,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-stair-width",
+    code: "CIN-DECK-190",
     jurisdiction: CIN,
     trade: DECK,
     title: "Stair width at 36 in minimum",
@@ -604,6 +624,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-stair-handrail",
+    code: "CIN-DECK-200",
     jurisdiction: CIN,
     trade: DECK,
     title: "Handrail and its height",
@@ -643,6 +664,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-stair-pier",
+    code: "CIN-DECK-210",
     jurisdiction: CIN,
     trade: DECK,
     title: "Pier at the stair landing for 4 or more risers",
@@ -654,7 +676,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
     check: (p, ctx) => {
       if (p.stairRisers! >= L.stairPierRequiredAtRisers) {
         ctx.flag({
-          severity: "info",
+          severity: "advisory",
           title: `A 12" pier is required at the landing on a ${p.stairRisers}-riser stair`,
           why: 'Sheet 3 calls for a 12" pier if 4 or more risers, with the 2x12 stringers anchored to the concrete landing.',
           fix: 'Show the 12" pier and the stringer anchorage, with a landing at least 4" thick and 36" deep.',
@@ -667,6 +689,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
   /* ============================================================= submission */
   {
     id: "cin-deck-hot-tub",
+    code: "CIN-DECK-220",
     jurisdiction: CIN,
     trade: DECK,
     title: "This drawing set does not cover spa loading",
@@ -674,6 +697,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
     sourceId: "cin-deck-sheet1",
     confidence: "verified",
     encodedOn: ENCODED,
+    escalatesToEngineering: true,
     appliesTo: (p) => p.hasHotTub === true,
     check: (_p, ctx) => {
       ctx.flag({
@@ -689,6 +713,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
 
   {
     id: "cin-deck-span-config",
+    code: "CIN-DECK-230",
     jurisdiction: CIN,
     trade: DECK,
     title: "Span configuration is stated",
@@ -699,7 +724,7 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
     appliesTo: (p) => p.spanConfiguration == null,
     check: (_p, ctx) => {
       ctx.flag({
-        severity: "correction",
+        severity: "warning",
         title: "Single-span or multi-span is not stated",
         why:
           "Sheet 2 step [5] makes you choose one, and the footing sizes on the Sheet 1 table differ between the two columns — " +

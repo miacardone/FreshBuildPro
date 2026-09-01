@@ -1,69 +1,106 @@
 @import "tailwindcss";
 
 /*
- * FreshBuild Pro — a jobsite palette. Slate and steel, with one signal color
- * per severity. Legible at arm's length on a phone in a truck.
+ * FreshBuild Pro — permit operations.
+ *
+ * Dark rail, gold accent, light work surface. The rail is chrome; the paper is
+ * where the job lives. Severity colors stay loud because they are the product:
+ * a contractor scanning on a phone in a truck should see red before he reads.
  */
 :root {
-  --background: #f6f7f8;
+  /* Work surface */
+  --canvas: #f3f4f6;
   --surface: #ffffff;
-  --surface-muted: #f1f3f5;
-  --foreground: #14181d;
-  --muted: #5b6672;
-  --border: #dde1e6;
+  --surface-muted: #f5f6f8;
+  --ink: #14171c;
+  --ink-muted: #5b6672;
+  --line: #dfe3e8;
 
-  --brand: #14532d;
-  --brand-soft: #e7f0ea;
+  /* Chrome */
+  --rail: #101114;
+  --rail-line: #24262c;
+  --rail-ink: #9aa0aa;
+  --strip: #000000;
 
-  --blocker: #b3261e;
-  --blocker-soft: #fdecea;
-  --correction: #b45309;
-  --correction-soft: #fdf3e3;
+  /* Brand */
+  --gold: #b8912c;
+  --gold-bright: #d9bc5e;
+
+  /* Severity */
+  --blocker: #c02626;
+  --blocker-soft: #fdecec;
+  --warning: #b45309;
+  --warning-soft: #fdf3e3;
   --confirm: #1d4ed8;
   --confirm-soft: #eaf0fe;
-  --info: #475569;
-  --info-soft: #eef1f4;
+  --advisory: #0369a1;
+  --advisory-soft: #e8f4fb;
   --ok: #15803d;
   --ok-soft: #e8f5ec;
+
+  /* Stat tiles */
+  --tile-neutral: #16233a;
+  --tile-blocked: #3a1416;
+  --tile-ready: #0e2e1c;
+  --tile-eng: #2e2408;
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
-  --color-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-border: var(--border);
-  --color-brand: var(--brand);
-  --color-brand-soft: var(--brand-soft);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-line: var(--line);
+  --color-rail: var(--rail);
+  --color-rail-line: var(--rail-line);
+  --color-rail-ink: var(--rail-ink);
+  --color-strip: var(--strip);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
   --color-blocker: var(--blocker);
   --color-blocker-soft: var(--blocker-soft);
-  --color-correction: var(--correction);
-  --color-correction-soft: var(--correction-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
   --color-confirm: var(--confirm);
   --color-confirm-soft: var(--confirm-soft);
-  --color-info: var(--info);
-  --color-info-soft: var(--info-soft);
+  --color-advisory: var(--advisory);
+  --color-advisory-soft: var(--advisory-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-tile-neutral: var(--tile-neutral);
+  --color-tile-blocked: var(--tile-blocked);
+  --color-tile-ready: var(--tile-ready);
+  --color-tile-eng: var(--tile-eng);
+  --font-sans: var(--font-sans-stack);
+  --font-serif: var(--font-serif-stack);
+  --font-mono: var(--font-mono-stack);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans-stack), system-ui, sans-serif;
 }
 
-/* Inputs share one look so a long intake form does not feel like a tax form. */
-.field {
-  @apply w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground
-         outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/15;
+.serif {
+  font-family: var(--font-serif-stack), Georgia, serif;
 }
-.label {
-  @apply block text-xs font-semibold uppercase tracking-wide text-muted;
-}
+
 .card {
-  @apply rounded-lg border border-border bg-surface;
+  @apply rounded-lg border border-line bg-surface;
+}
+
+.field {
+  @apply w-full rounded-md border border-line bg-surface px-3 py-2 text-sm text-ink
+         outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20;
+}
+
+.label {
+  @apply block text-[11px] font-semibold uppercase tracking-wide text-ink-muted;
+}
+
+/* Small caps eyebrow used above section content */
+.eyebrow {
+  @apply text-[11px] font-bold uppercase tracking-[0.12em] text-ink-muted;
 }

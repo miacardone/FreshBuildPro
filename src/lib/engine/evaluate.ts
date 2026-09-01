@@ -3,11 +3,13 @@ import type {
   Evaluation,
   Finding,
   Readiness,
+  ReviewTier,
   RuleContext,
   RuleRun,
   Severity,
 } from "@/lib/engine/types";
 import { getRuleSet } from "@/lib/engine/jurisdictions";
+import { deckAreaSqFt, TIER_1_MAX_AREA_SQFT } from "@/lib/rules/cincinnati/permit";
 
 /**
  * Fields a Cincinnati deck permit package cannot be assembled without.
@@ -32,9 +34,9 @@ const REQUIRED_FIELDS: { key: keyof DeckProject; label: string }[] = [
 
 const SEVERITY_WEIGHT: Record<Severity, number> = {
   blocker: 25,
-  correction: 10,
+  warning: 10,
   confirm: 3,
-  info: 0,
+  advisory: 0,
 };
 
 export function missingRequiredFields(project: DeckProject): string[] {
@@ -56,6 +58,8 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
 
   const findings: Finding[] = [];
   const runs: RuleRun[] = [];
+  /** Set when a tripped rule puts the job outside the city's stock drawing set. */
+  let escalate = false;
 
   for (const rule of ruleSet.rules) {
     const applies = rule.appliesTo ? rule.appliesTo(project) : true;
@@ -69,7 +73,7 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
       flag: (f) => {
         // A rule whose threshold is unconfirmed may not assert a pass or a fail.
         const severity: Severity =
-          rule.confidence === "needs_confirmation" && f.severity !== "info" ? "confirm" : f.severity;
+          rule.confidence === "needs_confirmation" && f.severity !== "advisory" ? "confirm" : f.severity;
         emitted.push({ ...f, severity, ruleId: rule.id, sourceId: rule.sourceId });
       },
       needsConfirmation: (f) => {
@@ -79,11 +83,14 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
 
     rule.check(project, ctx);
 
+    const tripped = emitted.some((f) => f.severity !== "advisory");
+    if (tripped && rule.escalatesToEngineering) escalate = true;
+
     findings.push(...emitted);
     runs.push({
       ruleId: rule.id,
       applied: true,
-      tripped: emitted.some((f) => f.severity !== "info"),
+      tripped,
       findingCount: emitted.length,
     });
   }
@@ -98,35 +105,56 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
     ruleSetVersion: ruleSet.version,
     findings,
     runs,
-    readiness: score(findings, missing),
+    readiness: score(findings, missing, escalate),
+    reviewTier: reviewTier(project),
   };
 }
 
-export function score(findings: Finding[], missingFields: string[]): Readiness {
+/**
+ * Which review path the job lands in. Cincinnati reviews residential decks under
+ * 400 sq ft same-day (Tier 1); at or over that they go to review by appointment
+ * or standard review.
+ */
+export function reviewTier(project: DeckProject): ReviewTier {
+  const area = deckAreaSqFt(project);
+  if (area == null) return "unknown";
+  return area < TIER_1_MAX_AREA_SQFT ? "tier_1" : "tier_2_or_3";
+}
+
+export function score(
+  findings: Finding[],
+  missingFields: string[],
+  escalatesToEngineering = false,
+): Readiness {
   const blockers = findings.filter((f) => f.severity === "blocker").length;
-  const corrections = findings.filter((f) => f.severity === "correction").length;
+  const warnings = findings.filter((f) => f.severity === "warning").length;
   const confirmations = findings.filter((f) => f.severity === "confirm").length;
+  const advisories = findings.filter((f) => f.severity === "advisory").length;
 
   let value = 100;
   value -= blockers * SEVERITY_WEIGHT.blocker;
-  value -= corrections * SEVERITY_WEIGHT.correction;
+  value -= warnings * SEVERITY_WEIGHT.warning;
   value -= confirmations * SEVERITY_WEIGHT.confirm;
   value -= missingFields.length * 5;
   const scoreValue = Math.max(0, Math.min(100, Math.round(value)));
 
-  // A job is never "ready" with a blocker or a missing field, whatever the number says.
+  // The number is a summary, not the gate. A job is never "ready" while a
+  // blocker stands or a required field is empty, whatever the score says.
   let status: Readiness["status"];
   let label: string;
-  if (blockers > 0) {
-    status = "not_ready";
+  if (escalatesToEngineering) {
+    status = "engineering_review";
+    label = "Outside the city's stock drawing set — needs an engineer";
+  } else if (blockers > 0) {
+    status = "blocked";
     label = blockers === 1 ? "1 blocker to clear" : `${blockers} blockers to clear`;
   } else if (missingFields.length > 0) {
-    status = "not_ready";
+    status = "blocked";
     label = `${missingFields.length} required field${missingFields.length === 1 ? "" : "s"} missing`;
-  } else if (corrections > 0 || confirmations > 0) {
+  } else if (warnings > 0 || confirmations > 0) {
     status = "needs_work";
     const parts = [];
-    if (corrections) parts.push(`${corrections} likely correction${corrections === 1 ? "" : "s"}`);
+    if (warnings) parts.push(`${warnings} warning${warnings === 1 ? "" : "s"}`);
     if (confirmations) parts.push(`${confirmations} to confirm`);
     label = parts.join(" · ");
   } else {
@@ -134,5 +162,5 @@ export function score(findings: Finding[], missingFields: string[]): Readiness {
     label = "Clean against the encoded rule set";
   }
 
-  return { score: scoreValue, status, label, blockers, corrections, confirmations, missingFields };
+  return { score: scoreValue, status, label, blockers, warnings, confirmations, advisories, missingFields };
 }

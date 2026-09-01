@@ -5,6 +5,7 @@ import { SEED_PROJECTS } from "@/lib/store/seed";
 import { cincinnatiDeckRules } from "@/lib/rules/cincinnati/deck";
 import { SOURCES } from "@/lib/rules/sources";
 import { CINCINNATI_BEAM_OPTIONS, CINCINNATI_JOIST_SPANS } from "@/lib/rules/cincinnati/deck-tables";
+import { cincinnatiPermitRules, TIER_1_MAX_AREA_SQFT } from "@/lib/rules/cincinnati/permit";
 import type { DeckProject, Severity } from "@/lib/engine/types";
 
 const willis = SEED_PROJECTS.find((p) => p.id === "seed-willis-deck")!;
@@ -31,7 +32,7 @@ describe("determinism", () => {
 describe("the Willis deck — built to code, should come back clean", () => {
   it("raises no blockers and no corrections", () => {
     const e = evaluate(willis);
-    const actionable = e.findings.filter((f) => f.severity !== "info");
+    const actionable = e.findings.filter((f) => f.severity !== "advisory");
     expect(actionable, JSON.stringify(actionable.map((f) => f.title), null, 2)).toEqual([]);
   });
 
@@ -75,7 +76,7 @@ describe("the questions Cincinnati does not ask", () => {
   it("never asks for lumber species — General Note 2 settles it", () => {
     expect(Object.keys(willis).join(" ").toLowerCase()).not.toContain("species");
     const f = findingFor(willis, "cin-deck-species-settled")!;
-    expect(f.severity).toBe("info");
+    expect(f.severity).toBe("advisory");
     expect(f.required).toContain("Southern Pine");
   });
 });
@@ -104,7 +105,7 @@ describe("rules a generic IRC-based tool would get wrong here", () => {
   it("treats a brick-veneer ledger as a detail to show, not a redesign", () => {
     const job = { ...willis, wallCladding: "brick_veneer" as const };
     const f = findingFor(job, "cin-deck-ledger-detail")!;
-    expect(f.severity).toBe("info");
+    expect(f.severity).toBe("advisory");
     expect(f.title).toContain("Brick Veneer");
     expect(f.fix).toContain("weep holes");
   });
@@ -133,8 +134,8 @@ describe("the Ludlow deck — the napkin job", () => {
     expect(ids).not.toContain("cin-deck-post-size");
   });
 
-  it("is not ready", () => {
-    expect(e.readiness.status).toBe("not_ready");
+  it("is not ready — the hot tub alone puts it outside the stock drawings", () => {
+    expect(e.readiness.status).toBe("engineering_review");
   });
 });
 
@@ -175,7 +176,7 @@ describe("the engine will not assert what the source leaves ambiguous", () => {
     );
     for (const project of [willis, ludlow]) {
       const asserted = evaluate(project).findings.filter(
-        (f) => unconfirmed.has(f.ruleId) && f.severity !== "confirm" && f.severity !== "info",
+        (f) => unconfirmed.has(f.ruleId) && f.severity !== "confirm" && f.severity !== "advisory",
       );
       expect(asserted).toEqual([]);
     }
@@ -194,18 +195,75 @@ describe("jurisdiction boundary", () => {
   });
 });
 
+describe("review tier and the permit path", () => {
+  it("puts a deck under 400 sq ft on Tier 1 same-day review", () => {
+    // Willis is 16 x 12 = 192 sq ft.
+    expect(evaluate(willis).reviewTier).toBe("tier_1");
+    const f = findingFor(willis, "cin-tier1-eligibility")!;
+    expect(f.severity).toBe("advisory");
+    expect(f.title).toContain("Tier 1");
+  });
+
+  it("treats exactly 400 sq ft as over the limit, because the city says under", () => {
+    const job = { ...willis, deckLength: 20, deckWidth: 20 };
+    expect(evaluate(job).reviewTier).toBe("tier_2_or_3");
+    expect(severityFor(job, "cin-tier1-eligibility")).toBe("warning");
+  });
+
+  it("blocks a historic property until the Certificate of Appropriateness is in hand", () => {
+    const job = { ...willis, inHistoricDistrict: true };
+    const f = findingFor(job, "cin-historic-coa")!;
+    expect(f.severity).toBe("blocker");
+    expect(evaluate(job).readiness.status).toBe("blocked");
+  });
+
+  it("does not guess whether the floodplain pulls a Tier 1 deck out of same-day review", () => {
+    const job = { ...willis, inFloodplain: true };
+    expect(severityFor(job, "cin-floodplain-tier")).toBe("confirm");
+  });
+
+  it("raises the separate trade permits the scope pulls in", () => {
+    const job = { ...willis, hasElectrical: true, hasPlumbing: true, hasMechanical: true };
+    expect(severityFor(job, "cin-electrical-permit")).toBe("confirm");
+    expect(severityFor(job, "cin-plumbing-permit")).toBe("confirm");
+    expect(severityFor(job, "cin-mechanical-permit")).toBe("confirm");
+  });
+
+  it("says plainly that zoning is not checked here", () => {
+    const f = findingFor(willis, "cin-zoning-not-evaluated")!;
+    expect(f.severity).toBe("advisory");
+    expect(f.title.toLowerCase()).toContain("setback");
+  });
+
+  it("keeps the Tier 1 threshold at the city's 400 sq ft", () => {
+    expect(TIER_1_MAX_AREA_SQFT).toBe(400);
+  });
+});
+
+describe("engineering review", () => {
+  it("escalates a job the stock drawing set does not cover", () => {
+    const job = { ...willis, hasHotTub: true };
+    expect(evaluate(job).readiness.status).toBe("engineering_review");
+  });
+
+  it("escalates an off-table beam and joist combination", () => {
+    const job = { ...willis, joistSize: "2x12" as const, beamSize: "(2) 2x6" as const };
+    expect(evaluate(job).readiness.status).toBe("engineering_review");
+  });
+});
+
 describe("readiness", () => {
   it("is never ready while a blocker stands", () => {
     const r = score(
       [{ ruleId: "x", severity: "blocker", title: "t", why: "w", fix: "f", sourceId: "cin-deck-sheet1" }],
       [],
     );
-    expect(r.status).toBe("not_ready");
+    expect(r.status).toBe("blocked");
   });
 
   it("is never ready while a required field is missing", () => {
     const r = score([], ["Footing depth"]);
-    expect(r.status).toBe("not_ready");
+    expect(r.status).toBe("blocked");
   });
 
   it("flags the fields a permit package cannot be assembled without", () => {
@@ -215,15 +273,19 @@ describe("readiness", () => {
 });
 
 describe("rule set integrity", () => {
+  const allRules = [...cincinnatiPermitRules, ...cincinnatiDeckRules];
+
   it("gives every rule a registered source", () => {
-    for (const rule of cincinnatiDeckRules) {
+    for (const rule of allRules) {
       expect(SOURCES[rule.sourceId], `${rule.id} cites unknown source`).toBeDefined();
     }
   });
 
-  it("keeps rule ids unique", () => {
-    const ids = cincinnatiDeckRules.map((r) => r.id);
+  it("keeps rule ids and examiner-facing codes unique", () => {
+    const ids = allRules.map((r) => r.id);
     expect(new Set(ids).size).toBe(ids.length);
+    const codes = allRules.map((r) => r.code);
+    expect(new Set(codes).size).toBe(codes.length);
   });
 
   it("transcribes all ten beam rows from the sheet", () => {

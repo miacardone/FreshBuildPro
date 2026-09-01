@@ -3,6 +3,7 @@ import {
   cincinnatiDeckRules,
   CINCINNATI_DECK_RULESET_VERSION,
 } from "@/lib/rules/cincinnati/deck";
+import { cincinnatiPermitRules } from "@/lib/rules/cincinnati/permit";
 
 export interface RuleSet {
   jurisdiction: string;
@@ -23,12 +24,17 @@ export const JURISDICTIONS: Jurisdiction[] = [
   { id: "cincinnati-oh", name: "Cincinnati", state: "OH", trades: ["deck"] },
 ];
 
+/** File types the city accepts for a digital submission. */
+export const ACCEPTED_FILE_TYPES = ["PDF", "JPG", "JPEG", "TIFF", "TIF"];
+
 const RULE_SETS: RuleSet[] = [
   {
     jurisdiction: "cincinnati-oh",
     trade: "deck",
     version: CINCINNATI_DECK_RULESET_VERSION,
-    rules: cincinnatiDeckRules,
+    // Permitting and property rules run first — they decide whether the job can
+    // be submitted at all, before any question of how it is framed.
+    rules: [...cincinnatiPermitRules, ...cincinnatiDeckRules],
   },
 ];
 

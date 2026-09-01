@@ -63,6 +63,43 @@ export const SOURCES: Record<string, Source> = {
   },
 };
 
+/* Permitting and property sources — the city's process pages rather than the
+   drawing set. These govern whether the job can be submitted at all, and by
+   which review path. */
+
+Object.assign(SOURCES, {
+  "cin-permit-review-process": {
+    id: "cin-permit-review-process",
+    jurisdiction: "cincinnati-oh",
+    title: "City of Cincinnati Buildings & Inspections — Permit Review Process",
+    locator: "Tier 1 / Tier 2 / Tier 3 review levels",
+    url: "https://www.cincinnati-oh.gov/buildings/building-permit-forms-applications/permit-guide/permit-review-process/",
+    edition: "Read 2026-08-31",
+    lastVerified: "2026-08-31",
+    recheckEveryDays: 60,
+  },
+  "cin-deck-permit-forms": {
+    id: "cin-deck-permit-forms",
+    jurisdiction: "cincinnati-oh",
+    title: "City of Cincinnati Buildings & Inspections — Decks (application forms)",
+    locator: "Required forms for a residential deck permit",
+    url: "https://www.cincinnati-oh.gov/buildings/application-forms/deck/",
+    edition: "Read 2026-08-31",
+    lastVerified: "2026-08-31",
+    recheckEveryDays: 60,
+  },
+  "cin-residential-permit-guide": {
+    id: "cin-residential-permit-guide",
+    jurisdiction: "cincinnati-oh",
+    title: "City of Cincinnati Buildings & Inspections — Residential Permit Guide",
+    locator: "Permit requirement, historic Certificate of Appropriateness, separate trade permits",
+    url: "https://www.cincinnati-oh.gov/buildings/old-apply-for-a-building-permit/permit-guide/residential-permit-guide/",
+    edition: "Read 2026-08-31",
+    lastVerified: "2026-08-31",
+    recheckEveryDays: 60,
+  },
+} satisfies Record<string, Source>);
+
 export function getSource(id: string): Source {
   const s = SOURCES[id];
   if (!s) throw new Error(`Unknown source: ${id}. Every rule must cite a registered source.`);

@@ -1,93 +1,124 @@
 import Link from "next/link";
 import { store } from "@/lib/store";
 import { evaluateSafe } from "@/lib/engine/safe";
-import { jurisdictionName } from "@/lib/engine/jurisdictions";
-import { ReadinessBadge } from "@/components/readiness-badge";
+import { StatusBadge } from "@/components/status-badge";
+import { StatTile } from "@/components/stat-tile";
 
 export const dynamic = "force-dynamic";
 
-export default async function JobsPage() {
+export default async function DashboardPage() {
   const projects = await store.list();
+  const rows = projects.map((project) => ({ project, result: evaluateSafe(project) }));
+
+  const ok = rows.filter((r) => r.result.ok);
+  const counts = {
+    active: projects.length,
+    blocked: ok.filter((r) => r.result.ok && r.result.evaluation.readiness.status === "blocked").length,
+    ready: ok.filter((r) => r.result.ok && r.result.evaluation.readiness.status === "ready").length,
+    tier1: ok.filter((r) => r.result.ok && r.result.evaluation.reviewTier === "tier_1").length,
+    engineering: ok.filter(
+      (r) => r.result.ok && r.result.evaluation.readiness.status === "engineering_review",
+    ).length,
+  };
+
+  const recent = rows.slice(0, 6);
+  const revisions = (
+    await Promise.all(projects.map(async (p) => (await store.evaluations(p.id)).map((e) => ({ p, e }))))
+  )
+    .flat()
+    .sort((a, b) => b.e.ranAt.localeCompare(a.e.ranAt))
+    .slice(0, 6);
 
   return (
-    <div>
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mx-auto max-w-6xl">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
-          <p className="mt-1 text-sm text-muted">
-            Every job checked against the city&apos;s own rules before anything is submitted.
+          <h1 className="serif text-2xl font-bold tracking-tight">Dashboard</h1>
+          <p className="mt-1 text-[13px] text-ink-muted">
+            Cincinnati residential deck permits — permit-readiness overview
           </p>
         </div>
         <Link
-          href="/jobs/new"
-          className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90"
+          href="/projects/new"
+          className="rounded bg-gold px-4 py-2 text-[13px] font-semibold text-white transition hover:brightness-110"
         >
-          New job
+          + New Project
         </Link>
       </div>
 
-      {projects.length === 0 ? (
-        <div className="card p-10 text-center">
-          <p className="text-sm font-medium">No jobs yet.</p>
-          <p className="mt-1 text-sm text-muted">
-            Enter a job in plain fields — no CAD, no drafting — and the engine checks it.
-          </p>
-          <Link
-            href="/jobs/new"
-            className="mt-4 inline-block rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white"
-          >
-            Start a job
-          </Link>
-        </div>
-      ) : (
-        <ul className="grid gap-3">
-          {projects.map((p) => {
-            const result = evaluateSafe(p);
-            return (
-              <li key={p.id}>
-                <Link
-                  href={`/jobs/${p.id}`}
-                  className="card block p-5 transition hover:border-brand/40 hover:shadow-sm"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h2 className="truncate text-base font-semibold">{p.name}</h2>
-                      <p className="mt-0.5 truncate text-sm text-muted">
-                        {p.address} · {jurisdictionName(p.jurisdiction)} · {p.trade}
-                      </p>
-                    </div>
-                    {result.ok ? (
-                      <ReadinessBadge readiness={result.evaluation.readiness} />
-                    ) : (
-                      <span className="rounded-full border border-border bg-surface-muted px-2.5 py-1 text-xs font-semibold text-muted">
-                        City not covered
-                      </span>
-                    )}
-                  </div>
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <StatTile label="Active Projects" value={counts.active} tone="neutral" icon="folder" />
+        <StatTile label="Blocked" value={counts.blocked} tone="blocked" icon="alert" />
+        <StatTile label="Ready for Submission" value={counts.ready} tone="ready" icon="check" />
+        <StatTile label="Tier 1 Candidates" value={counts.tier1} tone="neutral" icon="bolt" />
+        <StatTile label="Engineering Triggered" value={counts.engineering} tone="engineering" icon="stamp" />
+      </div>
 
-                  {result.ok && (
-                    <div className="mt-3 flex flex-wrap gap-4 text-xs text-muted">
-                      <span>
-                        <strong className="text-blocker">{result.evaluation.readiness.blockers}</strong> blockers
-                      </span>
-                      <span>
-                        <strong className="text-correction">{result.evaluation.readiness.corrections}</strong> likely
-                        corrections
-                      </span>
-                      <span>
-                        <strong className="text-confirm">{result.evaluation.readiness.confirmations}</strong> to confirm
-                      </span>
-                      <span className="ml-auto">
-                        {result.evaluation.runs.filter((r) => r.applied).length} rules ran
-                      </span>
+      <div className="grid gap-4 lg:grid-cols-[1.6fr_1fr]">
+        <section className="card overflow-hidden">
+          <header className="flex items-center justify-between border-b border-line px-5 py-3">
+            <h2 className="text-[13px] font-bold">Recently Updated Projects</h2>
+            <Link href="/projects" className="text-[12px] font-medium text-gold hover:underline">
+              View all →
+            </Link>
+          </header>
+          {recent.length === 0 ? (
+            <p className="px-5 py-10 text-center text-[13px] text-ink-muted">
+              No projects yet. Start one and the engine checks it on save.
+            </p>
+          ) : (
+            <ul>
+              {recent.map(({ project, result }) => (
+                <li key={project.id} className="border-b border-line last:border-0">
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="flex items-center justify-between gap-4 px-5 py-3.5 transition hover:bg-surface-muted"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate text-[13px] font-semibold">{project.name}</div>
+                      <div className="mt-0.5 text-[11px] text-ink-muted">
+                        {result.ok ? (
+                          <>
+                            Readiness {result.evaluation.readiness.score}% ·{" "}
+                            {result.evaluation.readiness.blockers} blocker(s) ·{" "}
+                            {result.evaluation.readiness.warnings} warning(s)
+                          </>
+                        ) : (
+                          "City not covered"
+                        )}
+                      </div>
                     </div>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                    {result.ok && <StatusBadge status={result.evaluation.readiness.status} />}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="card overflow-hidden">
+          <header className="border-b border-line px-5 py-3">
+            <h2 className="text-[13px] font-bold">Recent Revisions</h2>
+          </header>
+          {revisions.length === 0 ? (
+            <p className="px-5 py-10 text-center text-[13px] text-ink-muted">No revisions logged yet.</p>
+          ) : (
+            <ul>
+              {revisions.map(({ p, e }) => (
+                <li key={`${p.id}-${e.ranAt}`} className="border-b border-line px-5 py-3 last:border-0">
+                  <Link href={`/projects/${p.id}/revisions`} className="block">
+                    <div className="truncate text-[12px] font-semibold">{p.name}</div>
+                    <div className="mt-0.5 text-[11px] text-ink-muted">
+                      {new Date(e.ranAt).toLocaleString()} · {e.readiness.score}% ·{" "}
+                      {e.readiness.blockers} blocker(s)
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

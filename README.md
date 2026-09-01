@@ -57,6 +57,14 @@ Four properties are enforced in code, not left to author discipline:
 
 Full detail in [docs/ENGINE.md](docs/ENGINE.md).
 
+### Tier 1 same-day review
+
+Cincinnati reviews residential decks **under 400 sq ft** the same day, first-come
+first-served, 7:30 a.m. to 2:30 p.m. Over that, the job goes into the standard
+queue. Every project shows which path it lands in, because the difference between
+walking out with a permit and waiting weeks is worth knowing before you promise
+a client a date.
+
 ### The things generic tools get wrong
 
 Every deck-span calculator out there asks what species your lumber is.
@@ -82,19 +90,27 @@ the contractor which detail to draw, not to redesign a deck that was fine.
 
 ## Current state of the rule set
 
-23 Cincinnati deck rules are encoded, every one of them verified against the
-city's published "Residential Deck Drawings" set — the full Framing/Footing
-Table (4 joist rows, 10 beam rows with their footing sizes and ledger bolt
-spacing), the 19 General Notes, and the stair, guard, ledger and bracing details
-on Sheets 2 through 4. A copy of the set as transcribed is kept in
-[docs/sources/](docs/sources/) so a rule can be checked against exactly what was
-read.
+**31 Cincinnati rules encoded**, in two groups.
 
-One thing is deliberately *not* resolved: the city's own set is ambiguous about
-footing dimension [D] — Sheet 1 heads that column "min. thick", Sheet 4 calls it
-the required footing *depth*. The engine reports the conflict instead of picking
-a reading and failing a job on it. That is the behavior working as intended, and
-it is a question for the plan examiner.
+*Framing* — 23 rules, every one verified against the city's published
+"Residential Deck Drawings" set: the full Framing/Footing Table (4 joist rows,
+10 beam rows with their footing sizes and ledger bolt spacing), the General
+Notes, and the stair, guard, ledger and bracing details on Sheets 2 through 4.
+A copy of the set as transcribed is kept in [docs/sources/](docs/sources/).
+
+*Permitting and property* — 8 rules covering the things that stop a job before
+framing ever comes up: Tier 1 same-day review eligibility, historic Certificate
+of Appropriateness, floodplain, and the separate electrical, plumbing and
+mechanical permits a deck's scope can pull in.
+
+Two things are deliberately left unresolved rather than guessed:
+
+- The city's own set is ambiguous about footing dimension [D] — Sheet 1 heads
+  that column "min. thick", Sheet 4 calls it the required footing *depth*. The
+  engine reports the conflict instead of picking a reading.
+- Zoning — setbacks, lot coverage, rear-yard encroachment — is **not** encoded.
+  A deck can be framed perfectly and still be refused on placement, and the app
+  says so on every job rather than letting a contractor assume otherwise.
 
 [docs/RULE_VERIFICATION.md](docs/RULE_VERIFICATION.md) is the working checklist,
 including what is still open — zoning and setbacks are not encoded at all, and

@@ -19,8 +19,8 @@ function Section({
 }) {
   return (
     <section className="card p-5">
-      <h2 className="text-sm font-bold uppercase tracking-wide">{title}</h2>
-      {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
+      <h2 className="eyebrow text-ink">{title}</h2>
+      {hint && <p className="mt-1 text-[12px] text-ink-muted">{hint}</p>}
       <div className="mt-4 grid gap-4 sm:grid-cols-2">{children}</div>
     </section>
   );
@@ -302,6 +302,33 @@ export function JobForm({
         </Field>
       </Section>
 
+      <Section
+        title="The property"
+        hint="A deck can be framed perfectly and still be refused on where it sits or what the property is."
+      >
+        <Field label="Historic-designated property" name="inHistoricDistrict">
+          <YesNo name="inHistoricDistrict" defaultValue={p?.inHistoricDistrict} />
+        </Field>
+        <Field label="In the floodplain" name="inFloodplain">
+          <YesNo name="inFloodplain" defaultValue={p?.inFloodplain} />
+        </Field>
+      </Section>
+
+      <Section
+        title="Other trades on this job"
+        hint="Scope that pulls a separate permit alongside the deck."
+      >
+        <Field label="Lighting, receptacles or wiring" name="hasElectrical">
+          <YesNo name="hasElectrical" defaultValue={p?.hasElectrical} />
+        </Field>
+        <Field label="Gas or water run to the deck" name="hasPlumbing">
+          <YesNo name="hasPlumbing" defaultValue={p?.hasPlumbing} />
+        </Field>
+        <Field label="HVAC or gas appliance" name="hasMechanical">
+          <YesNo name="hasMechanical" defaultValue={p?.hasMechanical} />
+        </Field>
+      </Section>
+
       <section className="card p-5">
         <label className="label" htmlFor="notes">
           Notes
@@ -312,11 +339,11 @@ export function JobForm({
       <div className="flex items-center gap-3">
         <button
           type="submit"
-          className="rounded-md bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+          className="rounded bg-gold px-5 py-2.5 text-[13px] font-semibold text-white transition hover:brightness-110"
         >
           {submitLabel}
         </button>
-        <p className="text-xs text-muted">
+        <p className="text-[12px] text-ink-muted">
           The engine runs the moment you save. Nothing is submitted to the city from here.
         </p>
       </div>

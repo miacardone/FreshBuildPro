@@ -85,6 +85,12 @@ function readDeckFields(fd: FormData): Omit<DeckProject, "id" | "createdAt" | "u
     hasPostBracing: tri(fd, "hasPostBracing"),
     hasHotTub: tri(fd, "hasHotTub"),
 
+    inHistoricDistrict: tri(fd, "inHistoricDistrict"),
+    inFloodplain: tri(fd, "inFloodplain"),
+    hasElectrical: tri(fd, "hasElectrical"),
+    hasPlumbing: tri(fd, "hasPlumbing"),
+    hasMechanical: tri(fd, "hasMechanical"),
+
     notes: str(fd, "notes"),
   };
 }
@@ -94,7 +100,8 @@ export async function createJob(fd: FormData) {
   const result = evaluateSafe(project);
   if (result.ok) await store.recordEvaluation(result.evaluation);
   revalidatePath("/");
-  redirect(`/jobs/${project.id}`);
+  revalidatePath("/projects");
+  redirect(`/projects/${project.id}`);
 }
 
 export async function updateJob(id: string, fd: FormData) {
@@ -102,12 +109,14 @@ export async function updateJob(id: string, fd: FormData) {
   const result = evaluateSafe(project);
   if (result.ok) await store.recordEvaluation(result.evaluation);
   revalidatePath("/");
-  revalidatePath(`/jobs/${id}`);
-  redirect(`/jobs/${id}`);
+  revalidatePath("/projects");
+  revalidatePath(`/projects/${id}`);
+  redirect(`/projects/${id}`);
 }
 
 export async function deleteJob(id: string) {
   await store.remove(id);
   revalidatePath("/");
+  revalidatePath("/projects");
   redirect("/");
 }
