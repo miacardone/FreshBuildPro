@@ -12,7 +12,7 @@ export const SEED_PROJECTS: DeckProject[] = [
     id: "seed-willis-deck",
     name: "Willis deck",
     clientName: "Willis",
-    address: "Willis residence, Cincinnati",
+    address: "Ault View Ave",
     jurisdiction: "cincinnati-oh",
     trade: "deck",
     createdAt: "2026-08-20T14:00:00.000Z",
