@@ -53,9 +53,41 @@ function Mark() {
   );
 }
 
+/**
+ * Below `lg` the rail would eat most of a phone screen, so it collapses to a
+ * compact bar. The buyer works off a phone in a truck — the desktop rail is the
+ * exception, not the default.
+ */
+export function MobileNav() {
+  return (
+    <div className="border-b border-rail-line bg-rail lg:hidden">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <Link href="/" className="serif shrink-0 text-[15px] font-bold text-gold-bright">
+          FreshBuild Pro
+        </Link>
+        <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-rail-ink">
+          Permit Ops
+        </span>
+      </div>
+      <nav className="flex gap-1 overflow-x-auto px-3 pb-2">
+        {NAV.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-[12px] font-medium text-rail-ink transition hover:bg-white/5 hover:text-gold-bright"
+          >
+            <Icon name={item.icon} />
+            {item.label}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}
+
 export function Sidebar() {
   return (
-    <aside className="flex w-60 shrink-0 flex-col border-r border-rail-line bg-rail">
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-rail-line bg-rail lg:flex">
       <div className="flex flex-col items-center gap-2 px-5 pt-7 pb-6">
         <Mark />
         <div className="text-center">

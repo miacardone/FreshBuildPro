@@ -2,6 +2,9 @@ import Link from "next/link";
 import { JobForm } from "@/components/job-form";
 import { createJob } from "@/app/projects/actions";
 
+// The root layout reads live project counts, so this page cannot be prerendered.
+export const dynamic = "force-dynamic";
+
 export default function NewProjectPage() {
   return (
     <div className="mx-auto max-w-4xl">

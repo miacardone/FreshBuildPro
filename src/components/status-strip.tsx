@@ -21,22 +21,22 @@ export async function StatusStrip() {
   }
 
   return (
-    <div className="flex items-center gap-6 border-b border-rail-line bg-strip px-8 py-2.5 text-[11px]">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-rail-line bg-strip px-4 py-2.5 text-[11px] sm:gap-x-6 lg:px-8">
       <span className="flex items-center gap-1.5 text-white/70">
         <span className="h-1.5 w-1.5 rounded-full bg-blocker" />
         <strong className="font-semibold text-white">{blocked}</strong> blocked
       </span>
-      <span className="text-white/20">|</span>
+      <span className="hidden text-white/20 sm:inline">|</span>
       <span className="flex items-center gap-1.5 text-white/70">
         <span className="h-1.5 w-1.5 rounded-full bg-ok" />
         <strong className="font-semibold text-white">{ready}</strong> ready for submission
       </span>
-      <span className="text-white/20">|</span>
+      <span className="hidden text-white/20 sm:inline">|</span>
       <span className="flex items-center gap-1.5 text-white/70">
         <span className="h-1.5 w-1.5 rounded-full bg-warning" />
         <strong className="font-semibold text-white">{unresolved}</strong> unresolved blockers
       </span>
-      <span className="ml-auto text-[10px] font-semibold uppercase tracking-[0.16em] text-gold/70">
+      <span className="ml-auto hidden text-[10px] font-semibold uppercase tracking-[0.16em] text-gold/70 md:inline">
         Fresh Look Construction
       </span>
     </div>

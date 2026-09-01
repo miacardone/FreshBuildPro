@@ -18,7 +18,7 @@ export function ProjectTabs({ projectId }: { projectId: string }) {
   const base = `/projects/${projectId}`;
 
   return (
-    <nav className="flex flex-wrap gap-0 border-b border-line">
+    <nav className="flex gap-0 overflow-x-auto border-b border-line">
       {TABS.map((tab) => {
         const href = tab.segment ? `${base}/${tab.segment}` : base;
         const active = pathname === href;
@@ -26,7 +26,7 @@ export function ProjectTabs({ projectId }: { projectId: string }) {
           <Link
             key={tab.label}
             href={href}
-            className={`-mb-px border-b-2 px-4 py-2.5 text-[13px] font-medium transition ${
+            className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-4 py-2.5 text-[13px] font-medium transition ${
               active
                 ? "border-ink text-ink"
                 : "border-transparent text-ink-muted hover:border-line hover:text-ink"
