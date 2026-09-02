@@ -2,7 +2,8 @@ import { loadProject } from "@/lib/project-view";
 import { getSource, isPastDue } from "@/lib/rules/sources";
 import { getRuleSet } from "@/lib/engine/jurisdictions";
 import { SEVERITY_META, SEVERITY_ORDER, SeverityChip } from "@/components/severity";
-import type { Finding } from "@/lib/engine/types";
+import { acknowledgeFinding, withdrawAcknowledgement } from "@/app/projects/actions";
+import type { Acknowledgement, Finding } from "@/lib/engine/types";
 
 export const dynamic = "force-dynamic";
 
@@ -15,18 +16,36 @@ function Count({ label, value, tone }: { label: string; value: number; tone: str
   );
 }
 
-function IssueCard({ finding, code }: { finding: Finding; code?: string }) {
+function IssueCard({
+  finding,
+  code,
+  projectId,
+  acknowledgement,
+}: {
+  finding: Finding;
+  code?: string;
+  projectId: string;
+  acknowledgement?: Acknowledgement;
+}) {
   const source = getSource(finding.sourceId);
   const pastDue = isPastDue(source);
+  const canAcknowledge = finding.severity !== "advisory";
 
   return (
-    <li className="card overflow-hidden">
+    <li className={`card overflow-hidden ${acknowledgement ? "opacity-75" : ""}`}>
       <div className="flex">
         <div className={`w-1 shrink-0 ${SEVERITY_META[finding.severity].bar}`} aria-hidden />
         <div className="min-w-0 flex-1 px-5 py-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <h3 className="text-[13.5px] font-bold leading-snug">{finding.title}</h3>
-            <SeverityChip severity={finding.severity} />
+            <div className="flex shrink-0 items-center gap-2">
+              {acknowledgement && (
+                <span className="rounded border border-ink-muted px-2 py-0.5 text-[11px] font-semibold text-ink-muted">
+                  Acknowledged
+                </span>
+              )}
+              <SeverityChip severity={finding.severity} />
+            </div>
           </div>
           {code && <p className="mt-1 font-mono text-[10.5px] uppercase tracking-wide text-ink-muted">{code}</p>}
 
@@ -58,6 +77,61 @@ function IssueCard({ finding, code }: { finding: Finding; code?: string }) {
             </div>
           </dl>
 
+          {canAcknowledge && (
+            <div className="mt-3 border-t border-line pt-3">
+              {acknowledgement ? (
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 text-[12px]">
+                    <span className="font-semibold">Proceeding anyway: </span>
+                    <span className="text-ink-muted">{acknowledgement.reason}</span>
+                    <div className="mt-0.5 text-[10.5px] text-ink-muted">
+                      Recorded {new Date(acknowledgement.at).toLocaleString()} — this still counts
+                      against readiness.
+                    </div>
+                  </div>
+                  <form
+                    action={withdrawAcknowledgement.bind(null, projectId, finding.ruleId, finding.title)}
+                  >
+                    <button
+                      type="submit"
+                      className="shrink-0 rounded border border-line px-2.5 py-1 text-[11.5px] font-semibold text-ink-muted transition hover:border-ink hover:text-ink"
+                    >
+                      Withdraw
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <details className="group">
+                  <summary className="inline-flex cursor-pointer list-none items-center rounded border border-line px-2.5 py-1 text-[11.5px] font-semibold text-ink-muted transition hover:border-ink hover:text-ink">
+                    Acknowledge
+                  </summary>
+                  <form
+                    action={acknowledgeFinding.bind(null, projectId, finding.ruleId, finding.title)}
+                    className="mt-2.5 flex flex-wrap items-center gap-2"
+                  >
+                    <input
+                      name="reason"
+                      required
+                      maxLength={280}
+                      placeholder="Why are you proceeding past this?"
+                      className="field min-w-0 flex-1 !py-1.5 text-[12px]"
+                    />
+                    <button
+                      type="submit"
+                      className="shrink-0 rounded bg-ink px-3 py-1.5 text-[11.5px] font-semibold text-white"
+                    >
+                      Record
+                    </button>
+                  </form>
+                  <p className="mt-1.5 text-[10.5px] text-ink-muted">
+                    This does not clear the finding or change the score. It records who decided to
+                    proceed, when, and why.
+                  </p>
+                </details>
+              )}
+            </div>
+          )}
+
           <div className="mt-3 text-[11.5px]">
             <a href={source.url} target="_blank" rel="noreferrer" className="font-medium text-gold hover:underline">
               Source: {source.title} →
@@ -80,6 +154,10 @@ export default async function IssuesPage({ params }: PageProps<"/projects/[id]/i
   const { project, evaluation } = await loadProject(id);
   const ruleSet = getRuleSet(project.jurisdiction, project.trade);
   const codeFor = new Map(ruleSet.rules.map((r) => [r.id, r.code]));
+  // Bound to the exact wording, so a changed job invalidates the acknowledgement.
+  const acknowledged = new Map(
+    (project.acknowledgements ?? []).map((a) => [`${a.ruleId}::${a.title}`, a]),
+  );
 
   const grouped = SEVERITY_ORDER.map((severity) => ({
     severity,
@@ -88,12 +166,15 @@ export default async function IssuesPage({ params }: PageProps<"/projects/[id]/i
 
   return (
     <div className="grid gap-5">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <Count label="Blockers" value={evaluation.readiness.blockers} tone="bg-blocker" />
         <Count label="Warnings" value={evaluation.readiness.warnings} tone="bg-warning" />
         <Count label="To confirm" value={evaluation.readiness.confirmations} tone="bg-confirm" />
         <Count label="Advisories" value={evaluation.readiness.advisories} tone="bg-advisory" />
         <Count label="Confirmed" value={evaluation.confirmed.length} tone="bg-ok" />
+        {acknowledged.size > 0 && (
+          <Count label="Acknowledged" value={acknowledged.size} tone="bg-ink" />
+        )}
       </div>
 
       {evaluation.confirmed.length > 0 && (
@@ -150,7 +231,13 @@ export default async function IssuesPage({ params }: PageProps<"/projects/[id]/i
             <p className="eyebrow mb-2">{SEVERITY_META[group.severity].blurb}</p>
             <ul className="grid gap-3">
               {group.findings.map((f, i) => (
-                <IssueCard key={`${f.ruleId}-${i}`} finding={f} code={codeFor.get(f.ruleId)} />
+                <IssueCard
+                  key={`${f.ruleId}-${i}`}
+                  finding={f}
+                  code={codeFor.get(f.ruleId)}
+                  projectId={id}
+                  acknowledgement={acknowledged.get(`${f.ruleId}::${f.title}`)}
+                />
               ))}
             </ul>
           </section>

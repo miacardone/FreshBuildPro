@@ -138,6 +138,49 @@ export async function applyFramingOption(id: string, index: number) {
   redirect(`/projects/${id}/issues`);
 }
 
+/**
+ * Record that someone read a finding and is proceeding anyway. The finding stays
+ * exactly where it is and the readiness score does not move — this is a record
+ * of a decision, not a way to clear one.
+ */
+export async function acknowledgeFinding(
+  id: string,
+  ruleId: string,
+  title: string,
+  fd: FormData,
+) {
+  const reason = str(fd, "reason");
+  if (!reason) return; // an acknowledgement without a reason records nothing
+
+  const project = await store.get(id);
+  if (!project) throw new Error(`No project ${id}`);
+
+  const existing = (project.acknowledgements ?? []).filter(
+    (a) => !(a.ruleId === ruleId && a.title === title),
+  );
+  await store.update(id, {
+    acknowledgements: [...existing, { ruleId, title, reason, at: new Date().toISOString() }],
+  });
+
+  revalidatePath(`/projects/${id}`);
+  revalidatePath(`/projects/${id}/issues`);
+}
+
+/** Withdraw an acknowledgement. */
+export async function withdrawAcknowledgement(id: string, ruleId: string, title: string) {
+  const project = await store.get(id);
+  if (!project) throw new Error(`No project ${id}`);
+
+  await store.update(id, {
+    acknowledgements: (project.acknowledgements ?? []).filter(
+      (a) => !(a.ruleId === ruleId && a.title === title),
+    ),
+  });
+
+  revalidatePath(`/projects/${id}`);
+  revalidatePath(`/projects/${id}/issues`);
+}
+
 export async function deleteJob(id: string) {
   await store.remove(id);
   revalidatePath("/");

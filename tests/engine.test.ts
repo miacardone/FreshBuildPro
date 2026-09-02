@@ -362,3 +362,38 @@ describe("the permit document set", () => {
     expect(row!.ledgerBoltSpacingIn).toBe(willis.ledgerBoltSpacingIn);
   });
 });
+
+describe("acknowledging a finding", () => {
+  const ack = {
+    ruleId: "cin-deck-joist-span",
+    title:
+      "Joist span of 20 ft exceeds Cincinnati's maximum allowable span of 10 ft for 2x8 joists at 16\" o.c.",
+    reason: "Owner accepts the redesign risk; engineer engaged",
+    at: "2026-09-02T12:00:00.000Z",
+  };
+
+  it("does not change the readiness score or clear the finding", () => {
+    const before = evaluate(ludlow);
+    const after = evaluate({ ...ludlow, acknowledgements: [ack] });
+
+    expect(after.readiness.score).toBe(before.readiness.score);
+    expect(after.readiness.blockers).toBe(before.readiness.blockers);
+    expect(after.readiness.status).toBe(before.readiness.status);
+    expect(after.findings.map((f) => f.ruleId)).toEqual(before.findings.map((f) => f.ruleId));
+  });
+
+  it("is bound to the exact wording, so changing the job invalidates it", () => {
+    const changed = { ...ludlow, acknowledgements: [ack], joistSpanFt: 24 };
+    const finding = evaluate(changed).findings.find((f) => f.ruleId === ack.ruleId)!;
+    // The title now names 24 ft, so the stored acknowledgement no longer matches it.
+    expect(finding.title).not.toBe(ack.title);
+    expect(finding.title).toContain("24 ft");
+  });
+
+  it("still matches while the finding reads the same", () => {
+    const finding = evaluate({ ...ludlow, acknowledgements: [ack] }).findings.find(
+      (f) => f.ruleId === ack.ruleId,
+    )!;
+    expect(finding.title).toBe(ack.title);
+  });
+});

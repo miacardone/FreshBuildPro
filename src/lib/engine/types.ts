@@ -175,6 +175,28 @@ export type ProjectStatus =
 /** Cincinnati's review path, from the city's Permit Review Process. */
 export type ReviewTier = "tier_1" | "tier_2_or_3" | "unknown";
 
+/**
+ * A record that someone read a finding and decided to proceed anyway.
+ *
+ * Acknowledging does NOT clear the finding or change the readiness score. If it
+ * did, the score would stop meaning anything — a job could be walked to 100% by
+ * dismissing everything. What it produces is a liability record: who decided
+ * what, when, and on what reasoning.
+ *
+ * Bound to the finding's exact wording, not just its rule, so acknowledging
+ * "span of 20 ft exceeds..." does not silently carry over to "span of 24 ft
+ * exceeds..." after the job changes.
+ */
+export interface Acknowledgement {
+  ruleId: string;
+  /** The finding title as it read when it was acknowledged. */
+  title: string;
+  /** Why the contractor is proceeding. Required — an empty acknowledgement is worthless. */
+  reason: string;
+  /** ISO timestamp. */
+  at: string;
+}
+
 /* --------------------------------------------------------------------------
  * The deck project. Plain fields — no CAD, no drafting.
  * ----------------------------------------------------------------------- */
@@ -258,6 +280,9 @@ export interface DeckProject {
   hasPostBracing?: boolean;
   /** General Note 15 — this drawing set is not designed for spa loading. */
   hasHotTub?: boolean;
+
+  /** Findings someone decided to proceed past, and why. */
+  acknowledgements?: Acknowledgement[];
 
   /* Property constraints — a deck can be framed perfectly and still be refused
      on where it sits or what the property is. */
