@@ -2,6 +2,8 @@ import { loadProject } from "@/lib/project-view";
 import { ACCEPTED_FILE_TYPES } from "@/lib/engine/jurisdictions";
 import { DECK_SUBMISSION_FORMS } from "@/lib/rules/cincinnati/permit";
 import { getSource } from "@/lib/rules/sources";
+import Link from "next/link";
+import { DOCUMENTS } from "@/lib/documents/registry";
 
 export const dynamic = "force-dynamic";
 
@@ -85,15 +87,37 @@ export default async function DocumentsPage({ params }: PageProps<"/projects/[id
         </div>
       </section>
 
-      <section className="card border-dashed p-5">
-        <div className="eyebrow">Not built yet</div>
-        <h2 className="mt-1 text-[14px] font-bold">Filling these in automatically</h2>
-        <p className="mt-1.5 max-w-2xl text-[13px] text-ink-muted">
-          Sheets 2 through 5 of the city&apos;s deck set are fill-in-the-blank templates — numbered
-          steps [1] through [14] asking for exactly the values this project already holds. Producing
-          a completed set is the next build, and this tab will hand you the PDF when it exists. It
-          does not pretend to now.
+      <section>
+        <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+          <div>
+            <div className="eyebrow">Generated for this job</div>
+            <h2 className="serif mt-1 text-lg font-bold">Permit documents</h2>
+          </div>
+          <span className="text-[12px] text-ink-muted">{DOCUMENTS.length} documents</span>
+        </div>
+        <p className="mb-4 max-w-3xl text-[13px] text-ink-muted">
+          Built from this job&apos;s own data. These are contractor&apos;s worksheets, not city forms
+          — you still fill in and submit Cincinnati&apos;s own sheets. What these do is answer every
+          question those sheets ask, so filling them in is transcription instead of decisions. Each
+          one prints to PDF from the browser.
         </p>
+
+        <ul className="grid gap-3 sm:grid-cols-2">
+          {DOCUMENTS.map((d) => (
+            <li key={d.slug}>
+              <Link
+                href={`/projects/${id}/documents/${d.slug}`}
+                className="card flex h-full flex-col p-4 transition hover:border-gold/50 hover:shadow-sm"
+              >
+                <h3 className="text-[13.5px] font-bold">{d.title}</h3>
+                <p className="mt-1 flex-1 text-[12px] text-ink-muted">{d.purpose}</p>
+                <p className="mt-2.5 border-t border-line pt-2 text-[11px] text-gold">
+                  {d.goesWith} →
+                </p>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );

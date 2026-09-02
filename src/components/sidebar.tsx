@@ -61,7 +61,7 @@ function Mark() {
  */
 export function MobileNav() {
   return (
-    <div className="border-b border-rail-line bg-rail lg:hidden">
+    <div className="border-b border-rail-line bg-rail lg:hidden print:hidden">
       <div className="flex items-center gap-3 px-4 py-3">
         <Link href="/" className="serif shrink-0 text-[15px] font-bold text-gold-bright">
           FreshBuild Pro
@@ -106,7 +106,7 @@ function ResetDemo({ className = "" }: { className?: string }) {
 
 export function Sidebar() {
   return (
-    <aside className="hidden w-60 shrink-0 flex-col border-r border-rail-line bg-rail lg:flex">
+    <aside className="hidden w-60 shrink-0 flex-col border-r border-rail-line bg-rail lg:flex print:!hidden">
       <div className="flex flex-col items-center gap-2 px-5 pt-7 pb-6">
         <Mark />
         <div className="text-center">

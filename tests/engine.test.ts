@@ -4,7 +4,12 @@ import { getRuleSet, UnsupportedJurisdictionError } from "@/lib/engine/jurisdict
 import { SEED_PROJECTS } from "@/lib/store/seed";
 import { cincinnatiDeckRules } from "@/lib/rules/cincinnati/deck";
 import { SOURCES } from "@/lib/rules/sources";
-import { CINCINNATI_BEAM_OPTIONS, CINCINNATI_JOIST_SPANS } from "@/lib/rules/cincinnati/deck-tables";
+import {
+  CINCINNATI_BEAM_OPTIONS,
+  CINCINNATI_JOIST_SPANS,
+  findBeamOption,
+} from "@/lib/rules/cincinnati/deck-tables";
+import { DOCUMENTS } from "@/lib/documents/registry";
 import { cincinnatiPermitRules, TIER_1_MAX_AREA_SQFT } from "@/lib/rules/cincinnati/permit";
 import type { DeckProject, Severity } from "@/lib/engine/types";
 
@@ -331,5 +336,29 @@ describe("confirming the calls a contractor already made", () => {
     const ids = evaluate(ludlow).confirmed.map((c) => c.ruleId);
     expect(ids).not.toContain("cin-deck-joist-span");
     expect(ids).not.toContain("cin-deck-guard-required");
+  });
+});
+
+describe("the permit document set", () => {
+  it("offers the six documents the brief promises", () => {
+    expect(DOCUMENTS).toHaveLength(6);
+    expect(new Set(DOCUMENTS.map((d) => d.slug)).size).toBe(6);
+  });
+
+  it("answers every numbered blank on the city's sheets for a complete job", () => {
+    // The Willis deck is fully specified, so only the three choices made on the
+    // drawing itself should be left open.
+    const e = evaluate(willis);
+    expect(e.readiness.missingFields).toEqual([]);
+    expect(willis.joistSize && willis.beamSize && willis.spanConfiguration).toBeTruthy();
+    expect(willis.footingDiameterIn && willis.footingDepthIn && willis.deckHeightIn).toBeTruthy();
+    expect(willis.stairWidthIn).toBeTruthy();
+    expect(willis.wallCladding).toBeTruthy();
+  });
+
+  it("can identify the governing table row for a documented job", () => {
+    const row = findBeamOption(willis.joistSize!, willis.beamSize!);
+    expect(row).toBeDefined();
+    expect(row!.ledgerBoltSpacingIn).toBe(willis.ledgerBoltSpacingIn);
   });
 });

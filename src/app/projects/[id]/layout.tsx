@@ -17,11 +17,11 @@ export default async function ProjectLayout({ children, params }: LayoutProps<"/
 
   return (
     <div className="mx-auto max-w-6xl">
-      <Link href="/projects" className="text-[12px] text-gold hover:underline">
+      <Link href="/projects" className="text-[12px] text-gold hover:underline print:hidden">
         ← All projects
       </Link>
 
-      <header className="mt-3 rounded-lg bg-rail px-6 py-5">
+      <header className="mt-3 rounded-lg bg-rail px-6 py-5 print:hidden">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <h1 className="serif text-xl font-bold tracking-tight text-gold-bright">{project.name}</h1>
@@ -49,7 +49,7 @@ export default async function ProjectLayout({ children, params }: LayoutProps<"/
 
       {result.ok ? (
         <>
-          <div className="mt-5">
+          <div className="mt-5 print:hidden">
             <ProjectTabs projectId={id} />
           </div>
           <div className="pt-5">{children}</div>

@@ -26,7 +26,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="flex min-w-0 flex-1 flex-col">
             <MobileNav />
             <StatusStrip />
-            <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-7">{children}</main>
+            <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8 lg:py-7 print:p-0">{children}</main>
           </div>
         </div>
       </body>
