@@ -62,6 +62,27 @@ export interface RuleContext {
   flag: (f: Omit<Finding, "ruleId" | "sourceId">) => void;
   /** Emit a finding the engine is not certain about. Forces severity "confirm". */
   needsConfirmation: (f: Omit<Finding, "ruleId" | "sourceId" | "severity">) => void;
+  /**
+   * Record that this check passed, and on what number.
+   *
+   * A tool that only speaks up when something is wrong leaves the contractor
+   * guessing whether the rest was even looked at. Saying "6x6 posts at 72" —
+   * allowed" with the citation behind it is the difference between silence and
+   * confirmation. Dropped automatically if the same rule also flags something.
+   */
+  confirms: (c: Omit<ConfirmedCheck, "ruleId" | "sourceId">) => void;
+}
+
+/** A check that ran and passed, with the value it passed on. */
+export interface ConfirmedCheck {
+  ruleId: string;
+  sourceId: string;
+  /** What was confirmed, in the contractor's words. */
+  title: string;
+  /** What the project says. */
+  observed?: string;
+  /** What the code allows. */
+  required?: string;
 }
 
 export interface Rule<P = DeckProject> {
@@ -123,6 +144,8 @@ export interface Evaluation {
   findings: Finding[];
   /** Every rule the engine considered, whether or not it tripped. */
   runs: RuleRun[];
+  /** Checks that ran and passed — what the engine affirmatively agreed with. */
+  confirmed: ConfirmedCheck[];
   readiness: Readiness;
   /** Which of the city's review paths this job lands in. */
   reviewTier: ReviewTier;

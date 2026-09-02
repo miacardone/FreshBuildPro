@@ -26,11 +26,12 @@ export default async function OverviewPage({ params }: PageProps<"/projects/[id]
 
   return (
     <div className="grid gap-5">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Metric label="Blockers" value={readiness.blockers} tone="text-blocker" />
         <Metric label="Warnings" value={readiness.warnings} tone="text-warning" />
         <Metric label="To confirm" value={readiness.confirmations} tone="text-confirm" />
         <Metric label="Advisories" value={readiness.advisories} tone="text-advisory" />
+        <Metric label="Confirmed" value={evaluation.confirmed.length} tone="text-ok" />
       </div>
 
       {/* Review path — the thing a contractor most wants to know after "will it pass" */}
@@ -93,7 +94,11 @@ export default async function OverviewPage({ params }: PageProps<"/projects/[id]
               ))}
             {evaluation.findings.filter((f) => f.severity !== "advisory").length === 0 && (
               <li className="text-[13px] text-ink-muted">
-                Nothing tripped. Every applicable rule passed on this job.
+                Nothing tripped —{" "}
+                <Link href={`/projects/${id}/issues`} className="font-medium text-gold hover:underline">
+                  see the {evaluation.confirmed.length} checks the engine confirmed
+                </Link>
+                .
               </li>
             )}
           </ul>

@@ -88,16 +88,61 @@ export default async function IssuesPage({ params }: PageProps<"/projects/[id]/i
 
   return (
     <div className="grid gap-5">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Count label="Blockers" value={evaluation.readiness.blockers} tone="bg-blocker" />
         <Count label="Warnings" value={evaluation.readiness.warnings} tone="bg-warning" />
         <Count label="To confirm" value={evaluation.readiness.confirmations} tone="bg-confirm" />
         <Count label="Advisories" value={evaluation.readiness.advisories} tone="bg-advisory" />
+        <Count label="Confirmed" value={evaluation.confirmed.length} tone="bg-ok" />
       </div>
+
+      {evaluation.confirmed.length > 0 && (
+        <section className="card overflow-hidden border-ok/30">
+          <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-ok-soft px-5 py-3">
+            <div>
+              <h2 className="text-[13px] font-bold text-ok">
+                Confirmed — {evaluation.confirmed.length} check
+                {evaluation.confirmed.length === 1 ? "" : "s"} the engine agreed with
+              </h2>
+              <p className="mt-0.5 text-[11.5px] text-ink-muted">
+                What the engine checked and found right, and the number it checked against.
+              </p>
+            </div>
+          </header>
+          <ul>
+            {evaluation.confirmed.map((c, i) => {
+              const source = getSource(c.sourceId);
+              return (
+                <li
+                  key={`${c.ruleId}-${i}`}
+                  className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-line px-5 py-3 last:border-0"
+                >
+                  <span aria-hidden className="text-[13px] font-bold text-ok">
+                    ✓
+                  </span>
+                  <span className="min-w-0 flex-1 text-[13px]">{c.title}</span>
+                  {c.required && (
+                    <span className="font-mono text-[11.5px] text-ink-muted">{c.required}</span>
+                  )}
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 text-[11px] font-medium text-gold hover:underline"
+                  >
+                    {codeFor.get(c.ruleId) ?? "Source"} →
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {evaluation.findings.length === 0 ? (
         <div className="card p-10 text-center text-[13px] text-ink-muted">
-          Nothing tripped. Every applicable rule in the encoded set passed on this job.
+          Nothing tripped. Every applicable rule in the encoded set passed on this job — the
+          confirmed checks above show what the engine agreed with, and why.
         </div>
       ) : (
         grouped.map((group) => (

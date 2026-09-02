@@ -55,7 +55,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.joistSpacingIn}" o.c.`,
           required: `${MAX_JOIST_SPACING_IN}" o.c. maximum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Joists at ${p.joistSpacingIn}" o.c. — within the spacing the city's table is built on`,
+        observed: `${p.joistSpacingIn}" o.c.`,
+        required: `${MAX_JOIST_SPACING_IN}" o.c. maximum`,
+      });
     },
   },
 
@@ -82,7 +88,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.joistSpanFt} ft`,
           required: `${max} ft maximum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `${p.joistSize} joists spanning ${p.joistSpanFt} ft at 16" o.c. — within the city's table`,
+        observed: `${p.joistSpanFt} ft`,
+        required: `${max} ft maximum`,
+      });
     },
   },
 
@@ -112,7 +124,12 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.beamSize} with ${p.joistSize} joists`,
           required: allowed.join(" / "),
         });
+        return;
       }
+      ctx.confirms({
+        title: `${p.beamSize} is an offered beam row for ${p.joistSize} joists`,
+        observed: `${p.beamSize} with ${p.joistSize} joists`,
+      });
     },
   },
 
@@ -139,7 +156,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.beamSpanFt} ft`,
           required: `${option.maxSpanFt} ft maximum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `${option.beamSize} beam spanning ${p.beamSpanFt} ft — within the table row`,
+        observed: `${p.beamSpanFt} ft`,
+        required: `${option.maxSpanFt} ft maximum`,
+      });
     },
   },
 
@@ -173,6 +196,20 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           fix: "Shorten the overhang or move the beam line out.",
           observed: `${p.joistOverhangIn}"`,
           required: `${L.joistMaxOverhangIn}" maximum, measured from the center of the column`,
+        });
+      }
+      const beamOk = p.beamOverhangIn == null || p.beamOverhangIn <= L.beamMaxOverhangIn;
+      const joistOk = p.joistOverhangIn == null || p.joistOverhangIn <= L.joistMaxOverhangIn;
+      if (beamOk && joistOk) {
+        ctx.confirms({
+          title: "Beam and joist overhangs are within the city's limits",
+          observed: [
+            p.beamOverhangIn != null ? `beam ${p.beamOverhangIn}"` : null,
+            p.joistOverhangIn != null ? `joist ${p.joistOverhangIn}"` : null,
+          ]
+            .filter(Boolean)
+            .join(", "),
+          required: `beam ${L.beamMaxOverhangIn}" / joist ${L.joistMaxOverhangIn}" maximum`,
         });
       }
     },
@@ -271,7 +308,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.footingDepthIn}"`,
           required: `${L.footingMinDepthIn}" minimum below finished grade`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Footings at ${p.footingDepthIn}" below grade — at or past the city's minimum`,
+        observed: `${p.footingDepthIn}"`,
+        required: `${L.footingMinDepthIn}" minimum`,
+      });
     },
   },
 
@@ -300,7 +343,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.postSize} at ${p.deckHeightIn}" (${heightFt.toFixed(1)} ft)`,
           required: `${allowed.join(" / ")} for ${band.label}`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `${p.postSize} posts at ${p.deckHeightIn}" above grade — allowed at this height`,
+        observed: `${p.postSize} at ${p.deckHeightIn}" (${heightFt.toFixed(1)} ft)`,
+        required: `${allowed.join(" / ")} for ${band.label}`,
+      });
     },
   },
 
@@ -326,7 +375,12 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           fix: "Add the 2x4 diagonal brace attached to the bottom of the joists and show it on the framing plan.",
           required: "Required on all decks, in all areas",
         });
+        return;
       }
+      ctx.confirms({
+        title: "2x4 diagonal brace shown at the bottom of the joists",
+        required: "Required on all decks, in all areas",
+      });
     },
   },
 
@@ -352,7 +406,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.deckHeightIn}" above grade, bracing not indicated`,
           required: "6x6 diagonal bracing at all posts over 10 ft",
         });
+        return;
       }
+      ctx.confirms({
+        title: `6x6 diagonal bracing shown, as required over 10 ft above grade`,
+        observed: `${p.deckHeightIn}" above grade`,
+        required: "6x6 diagonal bracing at all posts over 10 ft",
+      });
     },
   },
 
@@ -447,7 +507,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.ledgerBoltSpacingIn}" o.c.`,
           required: `${required}" o.c. maximum, staggered`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `1/2" ledger bolts at ${p.ledgerBoltSpacingIn}" o.c. — matches this beam row`,
+        observed: `${p.ledgerBoltSpacingIn}" o.c.`,
+        required: `${required}" o.c. maximum, staggered`,
+      });
     },
   },
 
@@ -486,7 +552,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.guardHeightIn}"`,
           required: `${L.guardMinHeightIn}" minimum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Guard at ${p.guardHeightIn}" on a deck ${p.deckHeightIn}" above grade — required here, and tall enough`,
+        observed: `${p.guardHeightIn}" guard`,
+        required: `${L.guardMinHeightIn}" minimum`,
+      });
     },
   },
 
@@ -513,7 +585,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.guardOpeningIn}" opening`,
           required: 'Less than 4"',
         });
+        return;
       }
+      ctx.confirms({
+        title: `Guard openings of ${p.guardOpeningIn}" will not pass a 4" object`,
+        observed: `${p.guardOpeningIn}" opening`,
+        required: 'Less than 4"',
+      });
     },
   },
 
@@ -539,7 +617,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.guardPostSpacingFt} ft o.c.`,
           required: `${L.guardPostMaxSpacingFt} ft o.c. maximum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Guard posts at ${p.guardPostSpacingFt} ft o.c. — within the 6 ft maximum`,
+        observed: `${p.guardPostSpacingFt} ft o.c.`,
+        required: `${L.guardPostMaxSpacingFt} ft o.c. maximum`,
+      });
     },
   },
 
@@ -567,7 +651,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.riserHeightIn}"`,
           required: `${L.stairMaxRiserIn}" maximum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Risers at ${p.riserHeightIn}" — within Cincinnati's 8 1/4" maximum`,
+        observed: `${p.riserHeightIn}"`,
+        required: `${L.stairMaxRiserIn}" maximum`,
+      });
     },
   },
 
@@ -593,7 +683,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.treadDepthIn}"`,
           required: `${L.stairMinTreadIn}" minimum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Treads at ${p.treadDepthIn}" — at or past Cincinnati's 9" minimum`,
+        observed: `${p.treadDepthIn}"`,
+        required: `${L.stairMinTreadIn}" minimum`,
+      });
     },
   },
 
@@ -618,7 +714,13 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
           observed: `${p.stairWidthIn}"`,
           required: `${L.stairMinWidthIn}" minimum`,
         });
+        return;
       }
+      ctx.confirms({
+        title: `Stair ${p.stairWidthIn}" wide — at or past the 36" minimum`,
+        observed: `${p.stairWidthIn}"`,
+        required: `${L.stairMinWidthIn}" minimum`,
+      });
     },
   },
 
@@ -657,8 +759,16 @@ export const cincinnatiDeckRules: Rule<DeckProject>[] = [
             observed: `${h}"`,
             required: `${L.handrailMinHeightIn}"–${L.handrailMaxHeightIn}"`,
           });
+          return;
         }
       }
+      ctx.confirms({
+        title: p.handrailHeightIn
+          ? `Handrail at ${p.handrailHeightIn}" above the nosing — within the 34"–38" range`
+          : "Handrail shown on the stair",
+        observed: p.handrailHeightIn ? `${p.handrailHeightIn}"` : undefined,
+        required: `${L.handrailMinHeightIn}"–${L.handrailMaxHeightIn}" above the nosing`,
+      });
     },
   },
 

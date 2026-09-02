@@ -292,3 +292,44 @@ describe("rule set integrity", () => {
     expect(CINCINNATI_BEAM_OPTIONS).toHaveLength(10);
   });
 });
+
+describe("confirming the calls a contractor already made", () => {
+  it("confirms the Willis deck's 6x6 posts at that height — the brief's own example", () => {
+    const c = evaluate(willis).confirmed.find((x) => x.ruleId === "cin-deck-post-size")!;
+    expect(c).toBeDefined();
+    expect(c.title).toContain("6x6");
+    expect(c.observed).toContain('72"');
+    expect(c.required).toContain("4x4");
+  });
+
+  it("confirms the bracing the code wants — the brief's other example", () => {
+    const c = evaluate(willis).confirmed.find((x) => x.ruleId === "cin-deck-diagonal-brace")!;
+    expect(c).toBeDefined();
+    expect(c.required).toContain("all decks");
+  });
+
+  it("confirms a good deck broadly, with a citation on each", () => {
+    const e = evaluate(willis);
+    expect(e.confirmed.length).toBeGreaterThanOrEqual(10);
+    for (const c of e.confirmed) {
+      expect(SOURCES[c.sourceId], `${c.ruleId} confirmed without a source`).toBeDefined();
+    }
+  });
+
+  it("never confirms a check the same rule flagged", () => {
+    for (const project of [willis, ludlow]) {
+      const e = evaluate(project);
+      const flagged = new Set(
+        e.findings.filter((f) => f.severity !== "advisory").map((f) => f.ruleId),
+      );
+      const contradictions = e.confirmed.filter((c) => flagged.has(c.ruleId));
+      expect(contradictions).toEqual([]);
+    }
+  });
+
+  it("does not confirm the framing on the napkin job", () => {
+    const ids = evaluate(ludlow).confirmed.map((c) => c.ruleId);
+    expect(ids).not.toContain("cin-deck-joist-span");
+    expect(ids).not.toContain("cin-deck-guard-required");
+  });
+});

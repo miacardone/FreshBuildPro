@@ -1,4 +1,5 @@
 import type {
+  ConfirmedCheck,
   DeckProject,
   Evaluation,
   Finding,
@@ -58,6 +59,7 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
 
   const findings: Finding[] = [];
   const runs: RuleRun[] = [];
+  const confirmed: ConfirmedCheck[] = [];
   /** Set when a tripped rule puts the job outside the city's stock drawing set. */
   let escalate = false;
 
@@ -69,7 +71,9 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
     }
 
     const emitted: Finding[] = [];
+    const passed: ConfirmedCheck[] = [];
     const ctx: RuleContext = {
+      confirms: (c) => passed.push({ ...c, ruleId: rule.id, sourceId: rule.sourceId }),
       flag: (f) => {
         // A rule whose threshold is unconfirmed may not assert a pass or a fail.
         const severity: Severity =
@@ -85,6 +89,8 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
 
     const tripped = emitted.some((f) => f.severity !== "advisory");
     if (tripped && rule.escalatesToEngineering) escalate = true;
+    // A rule that flagged something does not also get to claim it passed.
+    if (!tripped) confirmed.push(...passed);
 
     findings.push(...emitted);
     runs.push({
@@ -105,6 +111,7 @@ export function evaluate(project: DeckProject, now = new Date()): Evaluation {
     ruleSetVersion: ruleSet.version,
     findings,
     runs,
+    confirmed,
     readiness: score(findings, missing, escalate),
     reviewTier: reviewTier(project),
   };
