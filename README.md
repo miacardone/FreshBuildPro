@@ -81,6 +81,31 @@ The solver covers framing, footings and the ledger. Guards, stairs and the
 property rules are not its remit, and it says so rather than implying it solved
 them.
 
+### Permit documents
+
+Once the design is clean, the app builds the paperwork. Six documents, generated
+from the job's own data and printable to PDF from the browser:
+
+| Document | What it is |
+|---|---|
+| Permit Application Cover Sheet | Identity, scope, review path, signature blocks |
+| **Deck Plan Specification** | Every numbered blank [1]–[14] on the city's five sheets, answered |
+| Framing & Footing Schedule | The one table row that governs this deck |
+| Site Plan Worksheet | What the city requires shown, with what's known filled in |
+| Compliance Report | Every finding and confirmed check, with citations |
+| Submission Checklist | The envelope, scope-driven extras, filing timing |
+
+The Deck Plan Specification is the one that earns its keep: sheets 2–5 of the
+city's set are fill-in-the-blank templates, so it answers each blank by number
+and sheet, and marks the three that are choices made on the drawing itself
+(beam-to-post connection, footing option, handrail grip) as *choose on the
+sheet* rather than inventing an answer. Filling in the city's set becomes
+transcription.
+
+These are deliberately **not** reproductions of the city's sheets. Each says so
+in its footer: contractor's worksheets that go alongside Cincinnati's own forms
+— not city forms, and not approvals.
+
 ### Tier 1 same-day review
 
 Cincinnati reviews residential decks **under 400 sq ft** the same day, first-come
